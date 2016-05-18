@@ -1,10 +1,17 @@
 'use strict';
 
 var app = angular.module('myApp', ['ui.bootstrap']);
-app.controller('testController', ['$scope', '$http', function($scope, $http) {;
-  $http.get('api/lobbies/list').then(function(response) {
-    $scope.arr = response.data;
-  }, function() {
-    $scope.arr = ["Failed"];
-  });
-}]);
+
+angular.module('myApp')
+  .controller('testController', function($scope, lobby) {
+    var refreshLobbyList = function() {
+      lobby.list().success(function(lobbies){ $scope.lobbies = lobbies;})
+    };
+    $scope.createGame = function(name){
+      console.log(name);
+      lobby.create(name);
+      refreshLobbyList();
+    };
+    $scope.lobbies = [];
+    refreshLobbyList();
+  })
