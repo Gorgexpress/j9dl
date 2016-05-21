@@ -6,13 +6,18 @@ module.exports = {
   },
 
   create: function(req, res, next) {
-    data.lobbies.push(req.params.name)
+    if (data.lobbies[req.params.name])
+      res.status(409).send({});
+    else{data.lobbies[req.params.name] = {
+      'players': [],
+      'forbid': []
+    };
     res.send({});
+    }
   },
 
-  getLobby: function(req, res, next) {
-    console.log(req.params.name);
-    var playerIds = data.lobbies[req.params.name].players;
+  get: function(req, res, next) {
+    var playerIds = data.lobbies[req.params.lobby].players;
     var users = {};
     playerIds.forEach(function(id) {
       users[data.users[id]] = id;

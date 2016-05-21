@@ -10,22 +10,8 @@ var bodyParser = require('body-parser');
 var app = express();
 var server = http.Server(app);
 var port = process.env.PORT || 3000;
-var io = require('socket.io')(server);
+var io = require('./config/socket.io.js')(server);
 
-io.on('connection', function(socket) {
-  socket.on('new lobby', function() {
-    io.emit('new lobby');
-  });
-  socket.on('join lobby', function(lobby) {
-    if (socket.room)
-      socket.leave(socket.room);
-    socket.join(lobby);
-    socket.room = lobby;
-    io.to(lobby).emit('user joined');
-    console.log(socket.rooms)
-  });
-  console.log('a user connected');
-});
 
 app.use(session({
   secret: 'ergvergerg',

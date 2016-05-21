@@ -16,7 +16,7 @@ app.get('/', function(req, res, next) {
 });
 
 app.get('/api/lobbies/list', controllers.list);
-app.get('/api/lobbies/listByLobby/:name', controllers.getLobby);
+app.get('/api/lobbies/get/:lobby', controllers.get);
 app.get('/api/user/list', function(req, res, next){
   res.status(200).json(data.users);
 });
