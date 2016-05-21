@@ -4,7 +4,10 @@ var path = require('path');
 var session = require('express-session');
 var redis = require('redis');
 var redisStore = require('connect-redis')(session);
-var client = redis.createClient();
+if(process.env.REDIS_URL) //necessary for heroku
+  var client = redis.createClient(process.env.REDIS_URL);
+else
+  var client = redis.createClient();
 var bodyParser = require('body-parser');
 
 var app = express();
