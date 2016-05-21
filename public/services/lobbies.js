@@ -8,6 +8,9 @@ angular.module('myApp')
       },
       create: function(name) {
         return $http.post('api/lobbies/create/' + name);
+      },
+      listByLobby: function(lobby) {
+        return $http.get('api/lobbies/listByLobby/' + lobby);
       }
     };
   });

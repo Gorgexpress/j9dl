@@ -10,6 +10,9 @@ angular.module('myApp')
     var refreshUserList = function() {
       user.list().success(function(users) { $scope.users = users; })
     };
+    var refreshLobbyUserList = function(room) {
+      lobby.listByLobby(room).success(function(users){ $scope.lobbyUsers = users;})
+    };
     $scope.createGame = function(name){
       lobby.create(name);
       refreshLobbyList();
@@ -17,7 +20,8 @@ angular.module('myApp')
     };
     $scope.joinLobby = function(lobby) {
       socket.emit('join lobby', lobby);
-    }
+      refreshLobbyUserList(lobby);
+    };
     socket.on('new lobby', function () {
       refreshLobbyList();
     });

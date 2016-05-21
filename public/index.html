@@ -19,6 +19,8 @@
     </div>
     <div class"col-xs-9">
       <p ng-repeat="user in users">{{ user  }} </p>
+      <p> Users in Lobby</p>
+      <p ng-repeat="(key, data) in lobbyUsers"> {{ key }} </p>
     </div>
   </div>
 </div>
