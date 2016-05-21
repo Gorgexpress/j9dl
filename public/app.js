@@ -15,8 +15,14 @@ angular.module('myApp')
       refreshLobbyList();
       socket.emit('new lobby');
     };
+    $scope.joinLobby = function(lobby) {
+      socket.emit('join lobby', lobby);
+    }
     socket.on('new lobby', function () {
       refreshLobbyList();
+    });
+    socket.on('user joined', function() {
+      console.log('user joined');
     });
     $scope.lobbies = [];
     refreshLobbyList();

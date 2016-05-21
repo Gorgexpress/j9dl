@@ -16,6 +16,14 @@ io.on('connection', function(socket) {
   socket.on('new lobby', function() {
     io.emit('new lobby');
   });
+  socket.on('join lobby', function(lobby) {
+    if (socket.room)
+      socket.leave(socket.room);
+    socket.join(lobby);
+    socket.room = lobby;
+    io.to(lobby).emit('user joined');
+    console.log(socket.rooms)
+  });
   console.log('a user connected');
 });
 
@@ -31,9 +39,9 @@ app.use(bodyParser.urlencoded({extended: true}));
 
 
 var controllers = require('./app/controllers/lobby');
-app.use(express.static(path.join(__dirname, 'public')));
 app.set('view engine', 'html');
 require('./app/routes.js')(app, controllers);
+app.use(express.static(path.join(__dirname, 'public')));
 server.listen(port, function() {
   console.log('listening on 3000');
 });
