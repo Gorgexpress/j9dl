@@ -1,3 +1,4 @@
+
 angular.module("myApp")
   .factory('socket', function ($rootScope) {
     var socket = io();
@@ -21,6 +22,14 @@ angular.module("myApp")
             }
           });
         })
+      },
+      removeAllListeners: function (eventName, callback) {
+        socket.removeAllListeners(eventName, function() {
+          var args = arguments;
+          $rootScope.$apply(function () {
+            callback.apply(socket, args);
+          });
+        });
       }
     };
   });

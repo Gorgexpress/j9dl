@@ -22,14 +22,24 @@ angular.module('myApp')
       socket.emit('join lobby', lobby);
       refreshLobbyUserList(lobby);
     };
+    $scope.sendMessage = function(msg){
+      socket.emit('message', socket.name + ": " + msg);
+    };
     socket.on('new lobby', function () {
       refreshLobbyList();
     });
     socket.on('user joined', function() {
       console.log('user joined');
     });
+    socket.on('message', function(msg) {
+      $scope.messages.push(msg);
+    });
     $scope.lobbies = [];
     $scope.lobbyUsers = {};
+    $scope.messages = [];
     refreshLobbyList();
     refreshUserList();
+    $scope.$on('$destroy', function (evcent) {
+      socket.removeAllListeners();
+    });
   })
