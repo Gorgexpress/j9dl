@@ -2,44 +2,67 @@
 
 var app = angular.module('myApp', ['ui.bootstrap']);
 
-angular.module('myApp')
-  .controller('testController', function($scope, lobby, user, socket) {
-    var refreshLobbyList = function() {
-      lobby.list().success(function(lobbies){ $scope.lobbies = lobbies;})
-    };
-    var refreshUserList = function() {
-      user.list().success(function(users) { $scope.users = users; })
-    };
-    var refreshLobbyUserList = function(lobbyName) {
-      lobby.get(lobbyName).success(function(users){ $scope.lobbyUsers = users;})
-    };
-    $scope.createGame = function(name){
-      lobby.create(name);
+angular.module('myApp').controller('testController', function($scope, Lobby, User, Socket) {
+  var refreshLobbyList = function() {
+    Lobby.list().success(function(lobbies){ $scope.lobbies = lobbies;})
+  };
+  var refreshUserList = function() {
+    User.list().success(function(users) { $scope.users = users; })
+  };
+  var refreshLobbyUserList = function(lobbyName) {
+    Lobby.get(lobbyName).success(function(users){ $scope.lobbyUsers = users;})
+  };
+  $scope.createGame = function(name){
+    if (!inLobby) {
+      Lobby.create(name);
       refreshLobbyList();
-      socket.emit('new lobby');
-    };
-    $scope.joinLobby = function(lobby) {
-      socket.emit('join lobby', lobby);
+      Socket.emit('new lobby');
+      Socket.emit('join lobby', name);
+      $scope.lobbyButtonText = "Leave Lobby";
+      inLobby = true;
+      refreshLobbyUserList(name);
+    }
+    else {
+      //code to leave lobby 
+      Lobby.leave();
+      Socket.emit('leave lobby', name);
+      $scope.lobbyButtonText = "Create Lobby";
+      inLobby = false;
+      $scope.lobbyUsers = {};
+    }
+  };
+  $scope.joinLobby = function(lobby) {
+    if(!inLobby) {
+      inLobby = true;
+      $scope.lobbyButtonText = "Leave Lobby";
+      Lobby.join(lobby);
+      Socket.emit('join lobby', lobby);
       refreshLobbyUserList(lobby);
-    };
-    $scope.sendMessage = function(msg){
-      socket.emit('message', socket.name + ": " + msg);
-    };
-    socket.on('new lobby', function () {
-      refreshLobbyList();
-    });
-    socket.on('user joined', function() {
-      console.log('user joined');
-    });
-    socket.on('message', function(msg) {
-      $scope.messages.push(msg);
-    });
-    $scope.lobbies = [];
-    $scope.lobbyUsers = {};
-    $scope.messages = [];
+    }
+  };
+  $scope.sendMessage = function(msg){
+    Socket.emit('message', socket.name + ": " + msg);
+  };
+  Socket.on('new lobby', function () {
     refreshLobbyList();
-    refreshUserList();
-    $scope.$on('$destroy', function (evcent) {
-      socket.removeAllListeners();
-    });
-  })
+  });
+  Socket.on('user joined', function() {
+    refreshLobbyList(); 
+  });
+  Socket.on('user left', function() {
+    refreshLobbyList();
+  });
+  Socket.on('message', function(msg) {
+    $scope.messages.push(msg);
+  });
+  $scope.lobbies = [];
+  $scope.lobbyUsers = {};
+  $scope.messages = [];
+  $scope.lobbyButtonText = "Create Lobby";
+  var inLobby = false;
+  refreshLobbyList();
+  refreshUserList();
+  $scope.$on('$destroy', function (event) {
+    Socket.removeAllListeners();
+  });
+})

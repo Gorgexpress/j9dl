@@ -14,7 +14,7 @@
           <button ng-repeat="lobby in lobbies track by $index" type="button" class="btn btn-primary" ng-click="joinLobby(lobby)"> {{ lobby }}</button>
         </div>
         <input type="text" ng-model="newLobbyName" class="form-control">
-        <button type="button" class="btn btn-primary" ng-click="createGame(newLobbyName)">Create Game</button>
+        <button type="button" class="btn btn-primary" ng-click="createGame(newLobbyName)">{{ lobbyButtonText }}</button>
       </div>
     </div>
     <div class"col-xs-9">

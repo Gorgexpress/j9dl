@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('myApp')
-  .factory('lobby', function($http) {
+  .factory('Lobby', function($http) {
     return {
       list: function() {
         return $http.get('api/lobbies/list');
@@ -11,6 +11,12 @@ angular.module('myApp')
       },
       get: function(lobby) {
         return $http.get('api/lobbies/get/' + lobby);
+      },
+      join: function(lobby) {
+        return $http.get('api/lobbies/join/' + lobby);
+      },
+      leave: function() {
+        return $http.get('api/lobbies/leave');
       }
     };
   });
