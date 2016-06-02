@@ -11,7 +11,6 @@ app.get('/', function(req, res, next) {
     if(!data.users[req.session.userid])
       data.users[req.session.userid] = req.session.name;
     res.sendFile(webFolder + 'index.html');
-
   }
 });
 

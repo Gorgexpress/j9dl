@@ -28,6 +28,7 @@ app.use(bodyParser.urlencoded({extended: true}));
 
 
 var controllers = require('./app/controllers/lobby');
+controllers.init(io);
 app.set('view engine', 'html');
 require('./app/routes.js')(app, controllers);
 app.use(express.static(path.join(__dirname, 'public')));

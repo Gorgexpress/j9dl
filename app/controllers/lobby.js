@@ -1,6 +1,11 @@
 var data = require('../../config/data.js');
-
+var sio = null;
 module.exports = {
+  init: function(io) {
+    sio = io;
+
+  },
+
   list: function(req, res, next) {
     res.status(200).json(Object.keys(data.lobbies));
   },
@@ -52,6 +57,7 @@ module.exports = {
       else if (lobbyData.host === req.session.userid){ //disband lobby if the host left
         delete data.lobbies[lobby];
         res.status(200).json("Lobby disbanded");
+        sio.sockets.emit('lobby ended', lobby);
       }
       else {
         var index = lobbyData.players.indexOf(req.session.userid);

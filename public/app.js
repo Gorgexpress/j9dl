@@ -9,14 +9,14 @@ angular.module('myApp').controller('testController', function($scope, Lobby, Use
   var refreshUserList = function() {
     User.list().success(function(users) { $scope.users = users; })
   };
-  var refreshLobbyUserList = function(lobbyName) {
-    Lobby.get(lobbyName).success(function(users){ $scope.lobbyUsers = users;})
+  var refreshLobbyUserList = function(lobby) {
+    Lobby.get(lobby).success(function(users){ $scope.lobbyUsers = users;})
   };
   $scope.createGame = function(name){
     if (!inLobby) {
       Lobby.create(name);
       refreshLobbyList();
-      Socket.emit('new lobby');
+      Socket.emit('new lobby', name);
       Socket.emit('join lobby', name);
       $scope.lobbyButtonText = "Leave Lobby";
       inLobby = true;
@@ -41,10 +41,14 @@ angular.module('myApp').controller('testController', function($scope, Lobby, Use
     }
   };
   $scope.sendMessage = function(msg){
-    Socket.emit('message', socket.name + ": " + msg);
+    Socket.emit('msg',msg);
   };
-  Socket.on('new lobby', function () {
-    refreshLobbyList();
+  Socket.on('new lobby', function (lobby) {
+    $scope.lobbies.push(lobby);
+  });
+  Socket.on('lobby ended', function(lobby) {
+    var index = $scope.lobbies.indexOf(lobby);
+    $scope.lobbies.splice(index, 1);
   });
   Socket.on('user joined', function() {
     refreshLobbyList(); 
@@ -52,7 +56,9 @@ angular.module('myApp').controller('testController', function($scope, Lobby, Use
   Socket.on('user left', function() {
     refreshLobbyList();
   });
-  Socket.on('message', function(msg) {
+  Socket.on('msg', function(msg) {
+    if ($scope.messages.length > 5 )//may want to use a diff queue implementation
+      $scope.messages.shift(); //that avoids shift
     $scope.messages.push(msg);
   });
   $scope.lobbies = [];

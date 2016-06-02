@@ -21,6 +21,9 @@ module.exports = function(server){
         socket.broadcast.emit('user left');
       }
     });
+    socket.on('msg', function(msg) {
+      io.emit('msg', msg)
+    })
     console.log('a user connected');
   });
   return io;
