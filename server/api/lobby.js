@@ -1,4 +1,4 @@
-var data = require('../../config/data.js');
+var data = require('../config/data.js');
 var sio = null;
 module.exports = {
   init: function(io) {

@@ -27,11 +27,12 @@ app.use(bodyParser.urlencoded({extended: true}));
 
 
 
-var controllers = require('./app/controllers/lobby');
+var controllers = require('./api/lobby');
 controllers.init(io);
 app.set('view engine', 'html');
-require('./app/routes.js')(app, controllers);
-app.use(express.static(path.join(__dirname, 'public')));
+app.set('clientPath', path.join(__dirname, '../client/'));
+require('./routes.js')(app, controllers);
+app.use(express.static(path.join(__dirname, '../client')));
 server.listen(port, function() {
   console.log('listening on 3000');
 });

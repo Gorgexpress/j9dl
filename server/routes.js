@@ -1,6 +1,5 @@
 var usernum = 1;
-var data = require('../config/data.js');
-var webFolder = __dirname.slice(0, -3) + 'public/';
+var data = require('./config/data.js');
 module.exports = function(app, controllers) {
   /* GET home page. */
 
@@ -10,7 +9,7 @@ app.get('/', function(req, res, next) {
   else{
     if(!data.users[req.session.userid])
       data.users[req.session.userid] = req.session.name;
-    res.sendFile(webFolder + 'index.html');
+    res.sendFile(app.get('clientPath') + 'index.html');
   }
 });
 
@@ -25,7 +24,7 @@ app.get('/api/user/list', function(req, res, next){
 app.post('/api/lobbies/create/:name', controllers.create);
 
 app.get('/login', function(req, res, next) {
-  res.sendFile(webFolder + 'login.html');
+  res.sendFile(app.get('clientPath') + 'login.html');
 });
 
 //temporary login for testing before integrating steam
