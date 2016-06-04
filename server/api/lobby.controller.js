@@ -1,20 +1,32 @@
-var data = require('../config/data.js');
 var User = require('./user.controller.js');
 var sio = null;
+
+lobbies = {
+  '-APEM pros only': {
+    'players': [20],
+    'forbid': [1000],
+    'host': [20]
+  },
+  'ARDM': {
+    'players': [25],
+    'forbid': [2000],
+    'host': [25]
+  }
+};
+
 module.exports = {
   init: function(io) {
     sio = io;
-
   },
 
   list: function(req, res, next) {
-    res.status(200).json(Object.keys(data.lobbies));
+    res.status(200).json(Object.keys(lobbies));
   },
 
   create: function(req, res, next) {
-    if (data.lobbies[req.params.name])
+    if (lobbies[req.params.name])
       res.status(409).send({});
-    else{data.lobbies[req.params.name] = {
+    else{lobbies[req.params.name] = {
       'players': [req.session.userid],
       'forbid': [],
       'host': req.session.userid 
@@ -25,7 +37,7 @@ module.exports = {
   },
 
   get: function(req, res, next) {
-    var playerIds = data.lobbies[req.params.lobby].players;
+    var playerIds = lobbies[req.params.lobby].players;
     var users = {};
     playerIds.forEach(function(id) {
       users[User.getName(id)] = id;
@@ -34,7 +46,7 @@ module.exports = {
   },
 
   join: function(req, res, next) {
-    var lobbyData = data.lobbies[req.params.lobby];
+    var lobbyData = lobbies[req.params.lobby];
     if (!lobbyData)
       res.status(500).json("Lobby not found");
     else if (req.session.lobby) //user should not be able to join a lobby while already in one
@@ -51,12 +63,12 @@ module.exports = {
       res.status(500).json("Lobby variable in session is null");
     else {
       var lobby = req.session.lobby;
-      var lobbyData = data.lobbies[lobby];
+      var lobbyData = lobbies[lobby];
       req.session.lobby = null;
       if (!lobbyData) //do nothing if lobby does not exist
         res.status(500).json("Lobby not found");
       else if (lobbyData.host === req.session.userid){ //disband lobby if the host left
-        delete data.lobbies[lobby];
+        delete lobbies[lobby];
         res.status(200).json("Lobby disbanded");
         sio.sockets.emit('lobby ended', lobby);
       }
@@ -66,7 +78,7 @@ module.exports = {
           res.status(500).json("Not in lobby");
         lobbyData.players.splice(index, 1);
         if(lobbyData.players.length === 0){ //if lobby is now empty, remove it.
-          delete data.lobbies[lobby];
+          delete lobbies[lobby];
           res.status(200).json("Lobby disbanded");
         }
         else
