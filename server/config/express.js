@@ -9,17 +9,17 @@ var bodyParser = require('body-parser');
 var path = require('path');
 
 module.exports = function(app) {
-
-  app.use(session({
-    secret: 'ergvergerg',
+var sessionMiddleware = session({
+  secret: 'ergvergerg',
     store: new redisStore({ host: 'localhost', port: 6379, client: client,ttl : 260}),
     saveUninitialized: false,
     resave: false
-  }));
+  });
+  app.use(sessionMiddleware);
   app.use(bodyParser.json());
   app.use(bodyParser.urlencoded({extended: true}));
 
   app.set('view engine', 'html');
   app.set('clientPath', path.join(__dirname, '../../client/'));
-
+  return sessionMiddleware;
 };

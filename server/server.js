@@ -7,7 +7,11 @@ var server = http.Server(app);
 var port = process.env.PORT || 3000;
 
 var io = require('./config/socket.io.js')(server);
-require('./config/express')(app);
+var middleware = require('./config/express')(app);
+
+io.use(function(socket, next) {
+  middleware(socket.request, socket.request.res, next);
+});
 
 var controllers = require('./api/lobby.controller');
 controllers.init(io);

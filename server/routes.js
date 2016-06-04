@@ -20,6 +20,13 @@ app.get('/api/lobbies/leave', controllers.leave);
 app.get('/api/user/list', function(req, res, next){
   res.status(200).json(User.listOnline());
 });
+app.get('/api/user/self', function(req, res, next) {
+  var self = {};
+  self.name = req.session.name;
+  self.userid = req.session.userid;
+  self.lobby = req.session.lobby;
+  res.status(200).json(self);
+});
 
 app.post('/api/lobbies/create/:name', controllers.create);
 

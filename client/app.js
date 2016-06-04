@@ -12,6 +12,9 @@ angular.module('myApp').controller('testController', function($scope, Lobby, Use
   var refreshLobbyUserList = function(lobby) {
     Lobby.get(lobby).success(function(users){ $scope.lobbyUsers = users;})
   };
+  var getSelf = function() {
+    User.self().success(function(self) { $scope.self = self;})
+  };
   $scope.createGame = function(name){
     if (!inLobby) {
       Lobby.create(name);
@@ -20,6 +23,7 @@ angular.module('myApp').controller('testController', function($scope, Lobby, Use
       Socket.emit('join lobby', name);
       $scope.lobbyButtonText = "Leave Lobby";
       inLobby = true;
+      $scope.activeBtn = $scope.lobbies.indexOf(name);
       refreshLobbyUserList(name);
     }
     else {
@@ -29,14 +33,16 @@ angular.module('myApp').controller('testController', function($scope, Lobby, Use
       $scope.lobbyButtonText = "Create Lobby";
       inLobby = false;
       $scope.lobbyUsers = {};
+      $scope.activeBtn = -1;
     }
   };
-  $scope.joinLobby = function(lobby) {
+  $scope.joinLobby = function(lobby, index) {
     if(!inLobby) {
       inLobby = true;
       $scope.lobbyButtonText = "Leave Lobby";
       Lobby.join(lobby);
       Socket.emit('join lobby', lobby);
+      $scope.activeBtn = index;
       refreshLobbyUserList(lobby);
     }
   };
@@ -71,4 +77,6 @@ angular.module('myApp').controller('testController', function($scope, Lobby, Use
   $scope.$on('$destroy', function (event) {
     Socket.removeAllListeners();
   });
+  getSelf();
+  //need to start modularing this code obviously
 })

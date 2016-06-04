@@ -85,5 +85,11 @@ module.exports = {
           res.status(200).json({});
       }
     }
+  },
+
+  disconnect: function(lobby, id) {
+    if (lobbies[lobby])
+      if (lobbies[lobby].players[id])
+        delete lobbies[lobby].players[id];
   }
 };
