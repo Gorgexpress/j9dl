@@ -20,7 +20,7 @@ angular.module('myApp')
         $scope.lobbyButtonText = "Create Lobby";
         $scope.inLobby = false;
         $scope.activeBtn = -1;
-        $scope.$parent.lobby = null;
+        $scope.lobby = null;
       }
     };
     $scope.joinLobby = function(lobby, index) {
@@ -30,7 +30,7 @@ angular.module('myApp')
         LobbyList.joinLobby(lobby);
         Socket.emit('join lobby', lobby);
         $scope.activeBtn = index;
-        $scope.$parent.lobby = lobby;
+        $scope.lobby = lobby;
       }
     };
     Socket.on('new lobby', function (lobby) {

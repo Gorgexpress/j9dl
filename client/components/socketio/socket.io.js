@@ -19,15 +19,10 @@ angular.module("myApp").factory('Socket', function ($rootScope) {
             callback.apply(socket, args);
           }
         });
-      })
+      });
     },
     removeAllListeners: function (eventName, callback) {
-      socket.removeAllListeners(eventName, function() {
-        var args = arguments;
-        $rootScope.$apply(function () {
-          callback.apply(socket, args);
-        });
-      });
+      socket.removeAllListeners(eventName);
     }
   };
 });
