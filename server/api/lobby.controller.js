@@ -80,6 +80,7 @@ module.exports = {
         if(lobbyData.players.length === 0){ //if lobby is now empty, remove it.
           delete lobbies[lobby];
           res.status(200).json("Lobby disbanded");
+          sio.sockets.emit('lobby ended', lobby);
         }
         else
           res.status(200).json({});

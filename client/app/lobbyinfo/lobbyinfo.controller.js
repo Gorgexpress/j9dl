@@ -12,5 +12,10 @@ angular.module('myApp')
     });
     $scope.lobbyUsers = {};
     refreshLobbyUserList($scope.lobby);
+    $scope.$on('$destroy', function (event) {
+      Socket.removeAllListeners('user joined');
+      Socket.removeAllListeners('user left');
+    });
+
     //need to start modularing this code obviously
   });

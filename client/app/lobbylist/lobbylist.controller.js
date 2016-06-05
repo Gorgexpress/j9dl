@@ -6,7 +6,6 @@ angular.module('myApp')
     $scope.createGame = function(name){
       if (!$scope.inLobby) {
         LobbyList.createLobby(name);
-        refreshLobbyList();
         Socket.emit('new lobby', name);
         Socket.emit('join lobby', name);
         $scope.lobbyButtonText = "Leave Lobby";
