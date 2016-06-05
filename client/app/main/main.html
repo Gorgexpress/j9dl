@@ -1,0 +1,18 @@
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-xs-3">
+      <lobby-list></lobby-list>
+    </div>
+    <div class="col-xs-9">
+      <div class="row">
+        <span ng-if="lobby">
+          <lobby-info lobby="lobby"></lobby-info> 
+        </span>
+      </div>
+      <div class="row">
+        <chat></chat>
+      </div>
+    </div>
+  </div>
+</div>
+

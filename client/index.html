@@ -6,43 +6,25 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
 <body ng-app="myApp">
-<div class="container-fluid">
-  <div ng-controller="testController" class="row">
-    <div class="col-xs-3">
-      <div class="panel panel-default" style="overflow-y: scroll;height: 100%;">
-        <div class="btn-group-vertical" style="width:100%;"> 
-          <button ng-repeat="lobby in lobbies track by $index" type="button" class="btn btn-primary" ng-class="{'btn btn-primary': activeBtn != $index, 'btn btn-success': activeBtn == $index}" ng-click="joinLobby(lobby, $index)" style="width:100%;"> {{ lobby }}</button>
-        </div>
-        <input type="text" ng-model="newLobbyName" class="form-control">
-        <button type="button" class="btn btn-primary" ng-click="createGame(newLobbyName)" style="width:100%;">{{ lobbyButtonText }}</button>
-      </div>
-    </div>
-    <div class="col-xs-9">
-      <div class="row">
-        <div class="panel panel-default" style="height: 50%;">
-          <p ng-repeat="user in users">{{ user  }} </p>
-          <p> Users in Lobby</p>
-          <p ng-repeat="(key, data) in lobbyUsers"> {{ key }} </p>
-        </div>
-      </div>
-      <div class="row">
-        <div class="panel panel-default" style="height: 50%;overflow-y: scroll;">
-          <p>Messages</p>
-          <p ng-repeat="message in messages"> {{ message }}</p>
-          <input type="text" ng-model="msgBox" class="form-control">
-          <button type="button" class="btn btn-primary" ng-click="sendMessage(msgBox)">Send</button>
-        </div> 
-      </div>
-    </div>
-  </div>
-</div>
+<div ui-view=""></div>
 <!--scripts-->
 <script src="/socket.io/socket.io.js"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-router/0.3.1/angular-ui-router.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/1.3.2/ui-bootstrap-tpls.min.js"></script>
-<script src="app.js"></script>
+<script src="app/app.js"></script>
+<script src="/app/lobbylist/lobbylist.controller.js"></script>
+<script src="/app/lobbylist/lobbylist.directive.js"></script>
+<script src="/app/lobbylist/lobbylist.service.js"></script>
+<script src="/app/lobbyinfo/lobbyinfo.controller.js"></script>
+<script src="/app/lobbyinfo/lobbyinfo.directive.js"></script>
+<script src="app/lobbyinfo/lobbyinfo.service.js"></script>
+<script src="/app/chat/chat.controller.js"></script>
+<script src="/app/chat/chat.directive.js"></script>
+<script src="app/main/main.js"></script>
+<script src="app/main/main.controller.js">
 <script src="/services/lobby.js"></script>
 <script src="/services/user.js"></script>
-<script src="/services/socket.io.js"></script>
+<script src="/components/socketio/socket.io.js"></script>
 </body>
 </html>
