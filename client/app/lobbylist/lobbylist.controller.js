@@ -11,7 +11,7 @@ angular.module('myApp')
         $scope.lobbyButtonText = "Leave Lobby";
         $scope.inLobby = true;
         $scope.activeBtn = $scope.lobbies.indexOf(name);
-        $scope.$parent.lobby = name;
+        $scope.lobby = name;
       }
       else {
         //code to leave lobby 
@@ -30,6 +30,11 @@ angular.module('myApp')
         LobbyList.joinLobby(lobby);
         Socket.emit('join lobby', lobby);
         $scope.activeBtn = index;
+        $scope.lobby = lobby;
+      }
+    };
+    $scope.viewLobby = function(lobby, index) {
+      if($scope.lobby !== lobby){
         $scope.lobby = lobby;
       }
     };

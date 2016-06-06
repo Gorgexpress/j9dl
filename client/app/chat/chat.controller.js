@@ -13,5 +13,9 @@ Socket.on('msg', function(msg) {
     $scope.messages.push(msg);
     });
 $scope.messages = [];
+$scope.messages.push("Welcome to j9dl!");
+$scope.messages.push("Single click to view a lobby.");
+$scope.messages.push("Double click to join a lobby.");
+
 //getSelf();
 });

@@ -4,11 +4,12 @@ angular.module('myApp')
       if (lobby)
         LobbyInfo.get(lobby).success(function(users){ $scope.lobbyUsers = users;})
     };
-    Socket.on('user joined', function() {
-      refreshLobbyUserList($scope.lobby); 
+    Socket.on('user joined', function(user) {
+      $scope.lobbyUsers[user.name] = user.id; 
     });
-    Socket.on('user left', function() {
-      refreshLobbyUserList($scope.lobby);
+    Socket.on('user left', function(user) {
+      if ($scopy.lobbyUsers[user])
+        delete $scope.lobbyUsers[user];
     });
     $scope.lobbyUsers = {};
     refreshLobbyUserList($scope.lobby);

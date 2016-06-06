@@ -5,8 +5,11 @@
     </div>
     <div class="col-xs-9">
       <div class="row">
-        <span ng-if="lobby">
+        <span ng-switch="lobby">
+          <div ng-switch-when="null"></div>
+          <div ng-switch-default>
           <lobby-info lobby="lobby"></lobby-info> 
+          </div>
         </span>
       </div>
       <div class="row">
