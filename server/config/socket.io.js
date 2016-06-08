@@ -5,7 +5,7 @@ module.exports = function(server){
   
   io.on('connection', function(socket) {
     socket.on('new lobby', function(lobby) {
-      io.emit('new lobby', lobby);
+      socket.broadcast.emit('new lobby', lobby);
     });
     socket.on('join lobby', function(lobby) {
       if (socket.room){

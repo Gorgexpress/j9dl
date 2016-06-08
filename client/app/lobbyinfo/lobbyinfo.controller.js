@@ -2,7 +2,13 @@ angular.module('myApp')
   .controller('LobbyInfoCtrl', function($scope, LobbyInfo, Socket) {
     var refreshLobbyUserList = function(lobby) {
       if (lobby)
-        LobbyInfo.get(lobby).success(function(users){ $scope.lobbyUsers = users;})
+        LobbyInfo.get(lobby)
+          .then(function(response){ 
+            $scope.lobbyUsers = response.data;
+          }, function (response) {
+            $scope.lobbyUsers = [];
+            alert("Could not get lobby: " + response);
+          });
     };
     Socket.on('user joined', function(user) {
       $scope.lobbyUsers[user.name] = user.id; 

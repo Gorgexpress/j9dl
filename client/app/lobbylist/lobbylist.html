@@ -2,7 +2,7 @@
   <div class="btn-group-vertical" style="width:100%;"> 
     <button ng-repeat="lobby in lobbies track by $index" type="button" class="btn btn-primary" ng-class="{'btn btn-primary': activeBtn != $index, 'btn btn-success': activeBtn == $index}" ng-click="viewLobby(lobby, $index)" ng-dblclick="joinLobby(lobby, $index)" style="width:100%;"> {{ lobby }}</button>
   </div>
-  <input type="text" ng-model="newLobbyName" class="form-control">
+  <input type="text" ng-model="newLobbyName" class="form-control" ng-model="inputText">
   <button type="button" class="btn btn-primary" ng-class="{'btn btn-primary': !inLobby, 'btn btn-danger': inLobby}" ng-click="createGame(newLobbyName)" style="width:100%;">{{ lobbyButtonText }}</button>
 </div>
 
