@@ -5,12 +5,14 @@ lobbies = {
   '-APEM pros only': {
     'players': [20],
     'forbid': [1000],
-    'host': [20]
+    'host': [20],
+    'inProgress': false,
   },
   'ARDM': {
     'players': [25],
     'forbid': [2000],
-    'host': [25]
+    'host': [25],
+    'inProgress': false,
   }
 };
 
@@ -41,7 +43,7 @@ module.exports = {
     var users = {};
     playerIds.forEach(function(id) {
       users[OnlineUser.getName(id)] = id;
-    })
+    });
     res.status(200).json(users);
   },
 

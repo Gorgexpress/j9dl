@@ -3,8 +3,6 @@ angular.module('myApp')
     return {
       templateUrl: 'app/lobbyinfo/lobbyinfo.html',
       controller: 'LobbyInfoCtrl',
-      scope: {
-        lobby: "="
-      }
+      scope: true 
     };
   });

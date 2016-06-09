@@ -18,7 +18,7 @@ angular.module('myApp')
         delete $scope.lobbyUsers[user];
     });
     $scope.lobbyUsers = {};
-    refreshLobbyUserList($scope.lobby);
+    refreshLobbyUserList($scope.$parent.lobby);
     $scope.$on('$destroy', function (event) {
       Socket.removeAllListeners('user joined');
       Socket.removeAllListeners('user left');
