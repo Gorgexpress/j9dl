@@ -1,24 +1,18 @@
-module.exports = function(db){
-  var userNames = {};
-  var userSchema = db.Schema({
+var mongoose = require('mongoose');
+var userSchema = new mongoose.Schema({
     id: {
       type: Number,
-  default: 0
+      default: 0
     },
     createdAt: {
       type: Date,
-  default: Date.now
+      default: Date.now
     },
     role: {
       type: Number,
-  default: 0
+      default: 0
     }
   });
-  var User = db.model('User', userSchema);
 
-  return {
-    getUserName: function(id) {
-      return userNames[id];
-    }
-  };
-};
+
+module.exports = mongoose.model('User', userSchema);

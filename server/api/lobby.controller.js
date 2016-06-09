@@ -1,4 +1,4 @@
-var User = require('./user.controller.js');
+var OnlineUser = require('./user.controller.js');
 var sio = null;
 
 lobbies = {
@@ -40,7 +40,7 @@ module.exports = {
     var playerIds = lobbies[req.params.lobby].players;
     var users = {};
     playerIds.forEach(function(id) {
-      users[User.getName(id)] = id;
+      users[OnlineUser.getName(id)] = id;
     })
     res.status(200).json(users);
   },

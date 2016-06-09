@@ -1,3 +1,5 @@
+var User = require('./user.model');
+
 var users = {
   20: 'Deadprez',
   25: 'vlv'
