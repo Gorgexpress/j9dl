@@ -40,11 +40,17 @@ module.exports = {
 
   get: function(req, res, next) {
     var playerIds = lobbies[req.params.lobby].players;
-    var users = {};
+    var lobbyObject = {
+      'host': lobbies[req.params.lobby].host,
+      'users': {}
+    };
     playerIds.forEach(function(id) {
-      users[OnlineUser.getName(id)] = id;
+      lobbyObject.users[id] = {
+        'name': OnlineUser.getName(id),
+        'role': 0
+      };
     });
-    res.status(200).json(users);
+    res.status(200).json(lobbyObject);
   },
 
   join: function(req, res, next) {

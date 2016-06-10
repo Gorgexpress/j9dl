@@ -15,13 +15,14 @@ module.exports = function(server){
     socket.on('join lobby', function(lobby) {
       if (socket.room){
         socket.leave(socket.room);
-        socket.broadcast.emit('user left');
+        socket.broadcast.emit('user left', socket.request.session.userid);
       }
       socket.join(lobby);
       socket.room = lobby;
       var user = {
-        name: socket.request.session.name,
-        id: socket.request.session.id
+        'id': socket.request.session.userid,
+        'name': socket.request.session.name,
+        'role': 0
       };
       io.to(lobby).emit('user joined', user);
     });
@@ -29,7 +30,7 @@ module.exports = function(server){
       if (socket.room){
         socket.leave(socket.room);
         socket.room = null;
-        socket.broadcast.emit('user left', socket.request.session.name);
+        socket.broadcast.emit('user left', socket.request.session.userid);
       }
     });
     socket.on('msg', function(msg) {

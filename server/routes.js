@@ -12,7 +12,7 @@ app.get('/', function(req, res, next) {
     res.sendFile(app.get('clientPath') + 'index.html');
   }
 });
-
+//TODO put remaining logic below in controllers
 app.get('/api/lobbies/list', controllers.list);
 app.get('/api/lobbies/get/:lobby', controllers.get);
 app.get('/api/lobbies/join/:lobby', controllers.join);
