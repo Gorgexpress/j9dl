@@ -7,6 +7,7 @@ lobbies = {
     'forbid': [1000],
     'host': [20],
     'inProgress': false,
+    'ready': []
   },
   'ARDM': {
     'players': [25],
@@ -92,6 +93,45 @@ module.exports = {
         }
         else
           res.status(200).json({});
+      }
+    }
+  },
+
+  ready: function(req, res, next) {
+    if (!req.session.lobby) {
+      console.log(req.session.userid + " used ready from lobby api but no lobby variable is set in session");
+      res.status(409).json({});
+    }
+    else if (!lobbies[req.session.lobby]) {
+      console.log("lobby.ready, lobby not found. userid:" + req.session.userid);
+      res.status(409).json({});
+    }
+    else if (lobbies[req.session.lobby].ready.indexOf(req.session.userid) > 0)
+      res.status(409).json("Already ready");
+    else {
+      lobbies[req.session.lobby].ready.push(req.session.userid);
+      res.status(200);
+    }
+  },
+
+  unready: function(req, res, next) {
+    if (!req.session.lobby) {
+      console.log(req.session.userid + " used unready from lobby api but no lobby variable is set in session");
+      res.status(409).json({});
+    }
+    else if (!lobbies[req.session.lobby]) {
+      console.log("lobby.unready, lobby not found. userid:" + req.session.userid);
+      res.status(409).json({});
+    }
+    else {
+      var index = lobbies[req.session.lobby].ready.indexOf(req.session.userid);
+      if (index < 0) {
+        res.status(409).json("Not ready");
+        console.log(req.session.userid + " used unready but was not found in ready array");
+      }
+      else {
+        lobbies[req.session.lobby].ready.splice(index, 1);
+        res.status(200);
       }
     }
   },

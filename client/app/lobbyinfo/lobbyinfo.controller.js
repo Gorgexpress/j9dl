@@ -1,6 +1,5 @@
 angular.module('myApp')
   .controller('LobbyInfoCtrl', function($scope, LobbyInfo, Socket) {
-    //TODO switch structure of lobbyUsers to array of objects with name, id, role, etc.. attributes
     var refreshLobbyUserList = function(lobby) {
       if (lobby)
         LobbyInfo.get(lobby)
@@ -15,6 +14,10 @@ angular.module('myApp')
             alert("Could not get lobby: " + response);
           });
     };
+    $scope.onReady = function(){
+      
+      //LobbyInfo.ready();
+    };
     Socket.on('user joined', function(user) {
       $scope.lobbyInfo.users[user.id] = {
         'name': user.name,
@@ -22,16 +25,22 @@ angular.module('myApp')
       };
       if(user.id === $scope.$parent.self.userid && $scope.lobbyInfo.users[user.id])
         $scope.showButtons = true;
+      if (Object.keys($scope.lobbyInfo.users).length == 2)
+        $scope.lobbyFull = true;
     });
     Socket.on('user left', function(user) {
       if ($scopy.lobbyInfo.users[user])
         delete $scope.lobbyInfo.users[user];
+      if ($scope.lobbyFull)
+        $scope.lobbyFull = false;
     });
     $scope.lobbyInfo = {
       'users': {}
     };
     $scope.showButtons = false;
     $scope.isHost = false;
+    $scope.lobbyFull = false;
+    $scope.ready = false;
     refreshLobbyUserList($scope.$parent.lobby);
     $scope.$on('$destroy', function (event) {
       Socket.removeAllListeners('user joined');

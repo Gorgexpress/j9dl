@@ -17,6 +17,8 @@ app.get('/api/lobbies/list', controllers.list);
 app.get('/api/lobbies/get/:lobby', controllers.get);
 app.get('/api/lobbies/join/:lobby', controllers.join);
 app.get('/api/lobbies/leave', controllers.leave);
+app.get('/api/lobbies/ready', controllers.ready);
+app.get('/api/lobbies/unready', controllers.unready);
 app.get('/api/user/list', function(req, res, next){
   res.status(200).json(User.listOnline());
 });
