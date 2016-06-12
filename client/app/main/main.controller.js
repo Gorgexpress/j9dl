@@ -11,5 +11,6 @@ angular.module('myApp')
     $scope.$on('$destroy', function (event) {
       Socket.removeAllListeners();
     });
+    $scope.self = {};
     getSelf();
   });

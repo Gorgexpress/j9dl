@@ -1,5 +1,6 @@
 <div class="panel panel-default" style="height: 50%;">
   <p> Users in Lobby</p>
   <p ng-repeat="(key, data) in lobbyInfo.users"> {{ data.name }} </p>
-  <button ng-if="showButtons && lobbyFull" ng-click="onReady()" class="btn btn-primary">Ready</button>
+  <button ng-if="showButtons && lobbyFull" ng-click="onReady()" ng-disabled="disableReadyButton" class="btn btn-primary">{{readyButtonText}}</button>
+  <button ng-if="isHost && lobbyFull" ng-click="onStart()" class="btn btn-primary" ng-disabled="!enableStartButton">Start</button>
 </div>

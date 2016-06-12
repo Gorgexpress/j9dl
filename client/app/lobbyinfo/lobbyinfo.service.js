@@ -4,6 +4,14 @@ angular.module('myApp')
     return {
       get: function(lobby) {
         return $http.get('api/lobbies/get/' + lobby);
+      },
+
+      ready: function() {
+        return $http.get('api/lobbies/ready');
+      },
+
+      unready: function() {
+        return $http.get('api/lobbies/unready');
       }
     };
   });

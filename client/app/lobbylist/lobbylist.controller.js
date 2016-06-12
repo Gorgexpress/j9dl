@@ -10,6 +10,7 @@ angular.module('myApp')
     };
     $scope.createGame = function(name){
       if (!$scope.inLobby) {
+        $scope.newLobbyName = "";
         LobbyList.createLobby(name).then( function (response) {
           $scope.lobbies.push(name);
           Socket.emit('new lobby', name);
@@ -17,7 +18,7 @@ angular.module('myApp')
           $scope.lobbyButtonText = "Leave Lobby";
           $scope.inLobby = true;
           $scope.activeBtn = $scope.lobbies.indexOf(name);
-          $scope.lobby = name;
+          $scope.$parent.lobby = name;
 
         }, function (response) {
           if (response.status == 409)
@@ -33,7 +34,7 @@ angular.module('myApp')
         $scope.lobbyButtonText = "Create Lobby";
         $scope.inLobby = false;
         $scope.activeBtn = -1;
-        $scope.lobby = null;
+        $scope.$parent.lobby = null;
       }
     };
     $scope.joinLobby = function(lobby, index) {
@@ -43,15 +44,15 @@ angular.module('myApp')
           $scope.lobbyButtonText = "Leave Lobby";
           Socket.emit('join lobby', lobby);
           $scope.activeBtn = index;
-          $scope.lobby = lobby;
+          $scope.$parent.lobby = lobby;
         }, function (response) {
           alert("Could not join lobby: " + response);
         });
       }
     };
     $scope.viewLobby = function(lobby, index) {
-      if($scope.lobby !== lobby){
-        $scope.lobby = lobby;
+      if($scope.$parent.lobby !== lobby){
+        $scope.$parent.lobby = lobby;
       }
     };
     Socket.on('new lobby', function (lobby) {
@@ -65,9 +66,17 @@ angular.module('myApp')
     $scope.lobbies = [];
     $scope.lobbyButtonText = "Create Lobby";
     $scope.inLobby = false;
+    $scope.newLobbyName = "";
+    var unregister = $scope.$watch('$parent.self', function () {
+      var index = $scope.lobbies.indexOf($scope.$parent.self.lobby);
+      if (index > 0)
+        $scope.activeBtn = index;
+      else //lobby doesn't exist, set it to null
+        $scope.$parent.self.lobby = null;
+      unregister(); //we only need this watcher to know when the variable is initialized
+    });
     refreshLobbyList();
       /*$scope.$on('$destroy', function (event) {
     Socket.removeAllListeners();
     });*/
-    //need to start modularing this code obviously
   });

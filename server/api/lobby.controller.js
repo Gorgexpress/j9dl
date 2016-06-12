@@ -14,6 +14,7 @@ lobbies = {
     'forbid': [2000],
     'host': [25],
     'inProgress': false,
+    'ready': []
   }
 };
 
@@ -29,10 +30,13 @@ module.exports = {
   create: function(req, res, next) {
     if (lobbies[req.params.name])
       res.status(409).send({});
-    else{lobbies[req.params.name] = {
+    else{
+      lobbies[req.params.name] = {
       'players': [req.session.userid],
       'forbid': [],
-      'host': req.session.userid 
+      'host': req.session.userid,
+      'inProgress': false,
+      'ready': []
     };
     req.session.lobby = req.params.name;
     res.send({});
@@ -86,6 +90,8 @@ module.exports = {
         if (index < 0) //Do nothing if our client isn't actually in the lobby it says it is in
           res.status(500).json("Not in lobby");
         lobbyData.players.splice(index, 1);
+        //unready everyone when someone leaves
+        lobbyData.ready = [];
         if(lobbyData.players.length === 0){ //if lobby is now empty, remove it.
           delete lobbies[lobby];
           res.status(200).json("Lobby disbanded");
@@ -110,7 +116,7 @@ module.exports = {
       res.status(409).json("Already ready");
     else {
       lobbies[req.session.lobby].ready.push(req.session.userid);
-      res.status(200);
+      res.status(200).json({});
     }
   },
 
@@ -131,7 +137,7 @@ module.exports = {
       }
       else {
         lobbies[req.session.lobby].ready.splice(index, 1);
-        res.status(200);
+        res.status(200).json({});
       }
     }
   },
