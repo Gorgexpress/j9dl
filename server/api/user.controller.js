@@ -6,6 +6,14 @@ var users = {
 };
 
 module.exports = {
+  getSelf: function(req, res, next) {
+    var self = {
+      'name': req.session.name,
+      'userid': req.session.userid,
+      'lobby': req.session.lobby
+    };
+    res.status(200).json(self);
+  },
   getName: function(id) {
     return users[id];
   },
