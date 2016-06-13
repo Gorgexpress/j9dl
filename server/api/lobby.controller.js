@@ -1,5 +1,8 @@
 var OnlineUser = require('./user.controller.js');
-var sio = null;
+var Rating = require('./rating.controller.js');
+var PythonShell = require('python-shell');
+var _ = require('lodash');
+var sio = null; //TODO move the necessary socket io code from here into the client
 
 lobbies = {
   '-APEM pros only': {
@@ -14,7 +17,7 @@ lobbies = {
     'forbid': [2000],
     'host': [25],
     'inProgress': false,
-    'ready': []
+    'ready': [25]
   }
 };
 
@@ -47,12 +50,14 @@ module.exports = {
     var playerIds = lobbies[req.params.lobby].players;
     var lobbyObject = {
       'host': lobbies[req.params.lobby].host,
-      'users': {}
+      'users': {},
+      'readyCount': lobbies[req.params.lobby].ready.length
     };
     playerIds.forEach(function(id) {
       lobbyObject.users[id] = {
         'name': OnlineUser.getName(id),
-        'role': 0
+        'role': 0,
+        'ready': lobbies[req.params.lobby].players.indexOf(id) > 0
       };
     });
     res.status(200).json(lobbyObject);
@@ -116,7 +121,11 @@ module.exports = {
       res.status(409).json("Already ready");
     else {
       lobbies[req.session.lobby].ready.push(req.session.userid);
-      res.status(200).json({});
+      //if everyone is ready, start the game
+      if (lobbies[req.session.lobby].ready.length === lobbies[req.session.lobby].players.length)
+        this.start(req, res, next);
+      else
+        res.status(200).json(false);
     }
   },
 
@@ -142,9 +151,49 @@ module.exports = {
     }
   },
 
+  start: function (req, res, next) {
+    //TODO move some of this code into another file?
+    var lobbyObject = lobbies[req.session.lobby];
+    if (lobbyObject.players.length != lobbyObject.ready.length) {
+      console.log(req.session.lobby + " tried to start but players and ready array have different values");
+      res.status(409).json({});
+      return;
+    }
+    var options = {
+      args: [],
+      scriptPath: './server/components/matchmaking'
+    }; 
+    //every two numbers in our args array corresponds to a player's 
+    //mu and sigma respectively. 
+    _.each(lobbyObject.players, function (userid) {
+      var rating = Rating.get(userid);
+      options.args.push(rating.mu);
+      options.args.push(rating.sigma);
+    });
+
+    var indices = [];
+    
+    PythonShell.run('find_balanced_teams.py', options, function (err, results) {
+      if(err) throw err;
+      indices = results[0];
+      var balancedPlayers = [];
+      _.each(indices, function (index) {
+        balancedPlayers.push(lobbyObject.players[index]);
+      });
+      lobbyObject.players = balancedPlayers;
+      lobbyObject.inProgress = true;
+      //tell the client we successfully balanced the lobby. They can get the results with the 
+      //get api call. If it's possible to cache the results of this api call we just send only
+      //the data that was changed in this one, rather than getting the whole lobby again.
+      res.status(200).json(true);
+    });
+
+  },
+
   disconnect: function(lobby, id) {
     if (lobbies[lobby])
       if (lobbies[lobby].players[id])
         delete lobbies[lobby].players[id];
-  }
+  },
+
 };

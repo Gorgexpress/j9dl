@@ -33,8 +33,17 @@ module.exports = function(server){
         socket.broadcast.emit('user left', socket.request.session.userid);
       }
     });
+    socket.on('lobby started', function() {
+      io.to(socket.room).emit('lobby started');
+    });
     socket.on('msg', function(msg) {
       io.emit('msg', socket.request.session.name + ": " + msg);
+    });
+    socket.on('user ready', function (userid) {
+      io.to(socket.room).emit('user ready', userid);
+    });
+    socket.on('user unready', function (userid) {
+      io.to(socket.room).emit('user unready', userid);
     });
     socket.on('disconnect', function() {
       if (socket.room) 

@@ -30,10 +30,13 @@ angular.module('myApp')
       if (!$scope.ready) {
         LobbyInfo.ready()
           .then(function (response) {
+            Socket.emit('user ready', $scope.$parent.self.userid);
             $scope.readyButtonText = "Unready";
             $scope.disableReadyButton = true;
             $scope.ready = true;
             timeoutPromise = $timeout(reenableReadyButtonCallback, 3000);         
+            if (response.data) //response data is true if lobby is started
+              Socket.emit('lobby started');
           }, function (response) {
             alert(response); 
           });
@@ -41,6 +44,7 @@ angular.module('myApp')
       else {
         LobbyInfo.unready()
           .then(function (response) {
+            Socket.emit('user unready', $scope.$parent.self.userid);
             $scope.readyButtonText = "Ready";
             $scope.disableReadyButton = true;
             $scope.ready = false;
@@ -49,11 +53,6 @@ angular.module('myApp')
             alert(response);
           });
       }
-    };
-
-    $scope.onStart = function() {
-      //double check that everyone is ready
-      
     };
     Socket.on('user joined', function(user) {
       $scope.lobbyInfo.users[user.id] = {
@@ -79,6 +78,16 @@ angular.module('myApp')
           $timeout.cancel(timeoutPromise);
       }
     });
+
+    Socket.on('user ready', function(userid) {
+      $scope.lobbyInfo.users[userid].ready = true;
+    });
+    Socket.on('user unready', function(userid) {
+      $scope.lobbyInfo.users[userid].ready = false;
+    });
+    Socket.on('lobby started', function() {
+      refreshLobbyUserList($scope.$parent.lobby);
+    });
     $scope.lobbyInfo = {
       'users': {}
     };
@@ -87,7 +96,6 @@ angular.module('myApp')
     $scope.lobbyFull = false;
     $scope.ready = false;
     $scope.disableReadyButton = false;
-    $scope.enableStartButton = false;
     $scope.readyButtonText = "Ready";
 
     //holds the promose from our $timeout call so we can cancel it if necessary
