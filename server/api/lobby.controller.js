@@ -67,7 +67,11 @@ module.exports = {
     var lobbyData = lobbies[req.params.lobby];
     if (!lobbyData)
       res.status(500).json("Lobby not found");
-    else if (req.session.lobby) //user should not be able to join a lobby while already in one
+    //Player should not be able to join a lobby if already in a lobby. We need to do a few extra checks
+    //even if req.session.lobby is set, as the lobby might not exist anymore or the user could have
+    //been forced out of it.
+    else if (req.session.lobby && lobbies[req.session.lobby] && 
+             lobbies[req.session.lobby].players.indexOf(req.session.userid) > 0) 
       res.status(500).json("Already in lobby");
     else {
       lobbyData.players.push(req.session.userid);
