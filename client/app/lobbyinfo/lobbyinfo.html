@@ -1,5 +1,23 @@
 <div class="panel panel-default" style="height: 50%;">
   <p> Users in Lobby</p>
-  <p ng-repeat="(key, data) in lobbyInfo.users"> {{ data.name }} </p>
-  <button ng-if="showButtons && lobbyFull" ng-click="onReady()" ng-disabled="disableReadyButton" class="btn btn-primary">{{readyButtonText}}</button>
+  <div ng-if="!lobbyInfo.inProgress">
+    <p ng-repeat="(key, data) in lobbyInfo.users"> {{ data.name }} </p>
+    <button ng-if="showButtons && lobbyFull" ng-click="onReady()" ng-disabled="disableReadyButton" class="btn btn-primary">{{readyButtonText}}</button>
+  </div>
+  <div ng-if="lobbyInfo.inProgress">
+    <div class="row">
+      <div class="col-xs-3">
+        <p>team1</p>
+        <p ng-repeat="userid in lobbyInfo.order | limitTo: 1">{{lobbyInfo.users[userid].name}}</p>
+      </div>
+      <div class="col-xs-3">
+        <p>team2</p>
+        <p ng-repeat="userid in lobbyInfo.order | limitTo: -1">{{lobbyInfo.users[userid].name}}</p>
+      </div>
+      <div class="col-xs-2">
+        <button class="btn btn-primary">team1</button>
+        <button class="btn btn-primary">team2</button>
+      </div>
+    </div>
+  </div>
 </div>

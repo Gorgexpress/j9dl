@@ -51,8 +51,10 @@ module.exports = {
     var lobbyObject = {
       'host': lobbies[req.params.lobby].host,
       'users': {},
-      'readyCount': lobbies[req.params.lobby].ready.length
-    };
+      'readyCount': lobbies[req.params.lobby].ready.length,
+      'inProgress': lobbies[req.params.lobby].inProgress,
+      'order': playerIds //ordered array of ids, as objects are unordered and ordering is important
+    };                   //important because order determines which team a player is on. TODO find a better way to do this?
     playerIds.forEach(function(id) {
       lobbyObject.users[id] = {
         'name': OnlineUser.getName(id),
@@ -179,7 +181,7 @@ module.exports = {
     
     PythonShell.run('find_balanced_teams.py', options, function (err, results) {
       if(err) throw err;
-      indices = results[0];
+      indices = JSON.parse(results[0]);
       var balancedPlayers = [];
       _.each(indices, function (index) {
         balancedPlayers.push(lobbyObject.players[index]);

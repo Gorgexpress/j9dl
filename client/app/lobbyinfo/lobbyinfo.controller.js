@@ -35,8 +35,6 @@ angular.module('myApp')
             $scope.disableReadyButton = true;
             $scope.ready = true;
             timeoutPromise = $timeout(reenableReadyButtonCallback, 3000);         
-            if (response.data) //response data is true if lobby is started
-              Socket.emit('lobby started');
           }, function (response) {
             alert(response); 
           });
@@ -81,8 +79,14 @@ angular.module('myApp')
 
     Socket.on('user ready', function(userid) {
       $scope.lobbyInfo.users[userid].ready = true;
+      $scope.lobbyInfo.readyCount++;
+      //if everyone is ready, refresh lobby info as teams will be balanced.
+      if (Object.keys($scope.lobbyInfo.users).length == $scope.lobbyInfo.readyCount){
+        refreshLobbyUserList($scope.$parent.lobby);
+      }
     });
     Socket.on('user unready', function(userid) {
+      $scope.lobbyInfo.readyCount--;
       $scope.lobbyInfo.users[userid].ready = false;
     });
     Socket.on('lobby started', function() {
