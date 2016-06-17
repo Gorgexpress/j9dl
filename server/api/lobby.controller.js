@@ -3,7 +3,7 @@ var Rating = require('./rating.controller.js');
 var PythonShell = require('python-shell');
 var _ = require('lodash');
 var sio = null; //TODO move the necessary socket io code from here into the client
-
+//TODO 95% of the controller logic ended up here.. should structure the api a different way.
 lobbies = {
   '-APEM pros only': {
     'players': [20],
@@ -56,10 +56,12 @@ module.exports = {
       'order': playerIds //ordered array of ids, as objects are unordered and ordering is important
     };                   //important because order determines which team a player is on. TODO find a better way to do this?
     playerIds.forEach(function(id) {
+      console.log(id);
       lobbyObject.users[id] = {
         'name': OnlineUser.getName(id),
         'role': 0,
-        'ready': lobbies[req.params.lobby].players.indexOf(id) > 0
+        'ready': lobbies[req.params.lobby].ready.indexOf(id) > 0,
+        'mu': Rating.get(id).mu
       };
     });
     res.status(200).json(lobbyObject);
@@ -195,7 +197,36 @@ module.exports = {
     });
 
   },
-
+  
+  voteWinner: function (req, res, next) {
+    //for now, only 1 vote is needed to declare a winner. In the future, winner
+    //will be decided by majority vote.
+    var players = lobbies[req.session.lobby].players;
+    var rankings = req.params.winner === 0 ? [0, 1] : [1, 0];
+    var options = {
+      args: [rankings],
+      scriptPath: './server/components/matchmaking'
+    }; 
+    //every two numbers in our args array corresponds to a player's 
+    //mu and sigma respectively. 
+    _.each(players, function (userid) {
+      var rating = Rating.get(userid);
+      options.args.push(rating.mu);
+      options.args.push(rating.sigma);
+    });
+    
+    PythonShell.run('recalculate_ratings.py', options, function (err, results) {
+      if(err) throw err;
+      newRatings = results[0];
+      console.log(results[0]);
+      _.each(newRatings, function (rating, index) {
+        Rating.update(players[index], rating);
+      });
+      //later we will close the lobby after the vote, but for now keeping it open makes it easier
+      //to see results
+      res.status(200).json(true);
+    });
+  },
   disconnect: function(lobby, id) {
     if (lobbies[lobby])
       if (lobbies[lobby].players[id])

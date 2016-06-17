@@ -12,5 +12,9 @@ for (var i = 0; i < 50; i++) {
 module.exports = {
   get: function(userid) {
     return ratings[userid];
+  },
+
+  update: function(userid, newRating) {
+    ratings[userid] = newRating;
   }
 };

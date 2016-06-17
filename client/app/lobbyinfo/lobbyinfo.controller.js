@@ -52,6 +52,16 @@ angular.module('myApp')
           });
       }
     };
+
+    //vote for winner after a game is finished
+    $scope.voteWinner = function(winner) {
+      LobbyInfo.voteWinner(0)
+        .then(function (response) {
+          refreshLobbyUserList(); //just update lobby info for now
+        }, function (response) {
+
+        });
+    };
     Socket.on('user joined', function(user) {
       $scope.lobbyInfo.users[user.id] = {
         'name': user.name,

@@ -12,6 +12,10 @@ angular.module('myApp')
 
       unready: function() {
         return $http.get('api/lobbies/unready');
+      },
+
+      voteWinner: function(winner) {
+        return $http.get('api/lobbies/voteWinner/' + winner);
       }
     };
   });

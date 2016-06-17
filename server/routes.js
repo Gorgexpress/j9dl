@@ -1,5 +1,6 @@
 var usernum = 1;
 var User = require('./api/user.controller.js');
+var Rating = require('./api/rating.controller.js');
 module.exports = function(app, controllers) {
   /* GET home page. */
 
@@ -20,6 +21,7 @@ app.get('/api/lobbies/leave', controllers.leave);
 app.get('/api/lobbies/ready', controllers.ready.bind(controllers));
 app.get('/api/lobbies/unready', controllers.unready);
 app.get('/api/lobbies/start', controllers.start);
+app.get('/api/lobbies/voteWinner/:winner', controllers.voteWinner);
 app.get('/api/user/list', function(req, res, next){
   res.status(200).json(User.listOnline());
 });
