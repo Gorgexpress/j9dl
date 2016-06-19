@@ -4,7 +4,7 @@ from itertools import combinations
 players = []
 
 for i in xrange(1, len(sys.argv), 2):
-    players.append(trueskill.Rating(mu=int(sys.argv[i]), sigma=int(sys.argv[i + 1])))
+    players.append(trueskill.Rating(mu=float(sys.argv[i]), sigma=float(sys.argv[i + 1])))
 
 if len(players) <= 2:
     result = [0, 1]

@@ -2,8 +2,7 @@ var EventEmitter = require('events');
 
 var LobbyEvents = new EventEmitter();
 
-//LobbyEvents.setMaxListeners(0);
-LobbyEvents.setMaxListeners(10);
+LobbyEvents.setMaxListeners(0);
 
 var events = {
   'disband': 'disband'

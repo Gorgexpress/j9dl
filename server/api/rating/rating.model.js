@@ -1,6 +1,6 @@
 var mongoose = require('mongoose');
 var ratingSchema = new mongoose.Schema({
-    id: {
+    userid: {
       type: Number,
       default: 0
     },
@@ -15,4 +15,4 @@ var ratingSchema = new mongoose.Schema({
   });
 
 
-module.exports = mongoose.model('User', userSchema);
+module.exports = mongoose.model('Rating', ratingSchema);

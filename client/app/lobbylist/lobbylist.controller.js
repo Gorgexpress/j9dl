@@ -65,8 +65,11 @@ angular.module('myApp')
       if ($scope.$parent.lobby == lobby)
         $scope.$parent.lobby = null;
       //same for lobby the client is currently in
-      if ($scope.$parent.self.lobby == lobby)
-        $scope.$parent.self.lobby = null;
+      if ($scope.activeBtn === index) {
+        $scope.lobbyButtonText = "Create Lobby";
+        $scope.inLobby = false;
+        $scope.activeBtn = -1;
+      }
     });
 
     $scope.lobbies = [];

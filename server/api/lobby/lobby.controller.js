@@ -1,5 +1,5 @@
 var OnlineUser = require('../user/user.controller.js');
-var Rating = require('../rating/rating.controller.js');
+var Rating = require('../rating/rating.model.js');
 var PythonShell = require('python-shell');
 var LobbyEvents = require('./lobby.events');
 var _ = require('lodash');
@@ -51,15 +51,19 @@ module.exports = {
       'inProgress': lobbies[req.params.lobby].inProgress,
       'order': playerIds //ordered array of ids, as objects are unordered and ordering is important
     };                   //important because order determines which team a player is on. TODO find a better way to do this?
-    playerIds.forEach(function(id) {
-      lobbyObject.users[id] = {
-        'name': OnlineUser.getName(id),
-        'role': 0,
-        'ready': lobbies[req.params.lobby].ready.indexOf(id) > 0,
-        'mu': Rating.get(id).mu
-      };
+    Rating.find({
+      'userid': { $in: playerIds}
+    }, function (err, ratings) {
+      playerIds.forEach(function(id, index) {
+        lobbyObject.users[id] = {
+          'name': OnlineUser.getName(id),
+          'role': 0,
+          'ready': lobbies[req.params.lobby].ready.indexOf(id) > 0,
+          'mu': Math.round(ratings[index].mu)
+        };
+      });
+      res.status(200).json(lobbyObject);
     });
-    res.status(200).json(lobbyObject);
   },
 
   join: function(req, res, next) {
@@ -71,7 +75,7 @@ module.exports = {
     //been forced out of it.
     else if (req.session.lobby && lobbies[req.session.lobby] && 
              lobbies[req.session.lobby].players.indexOf(req.session.userid) > 0) 
-      res.status(500).json("Already in lobby");
+    res.status(500).json("Already in lobby");
     else {
       lobbyData.players.push(req.session.userid);
       req.session.lobby = req.params.lobby;
@@ -166,33 +170,37 @@ module.exports = {
       args: [],
       scriptPath: './server/components/matchmaking'
     }; 
-    //every two numbers in our args array corresponds to a player's 
-    //mu and sigma respectively. 
-    _.each(lobbyObject.players, function (userid) {
-      var rating = Rating.get(userid);
-      options.args.push(rating.mu);
-      options.args.push(rating.sigma);
-    });
-
-    var indices = [];
-    
-    PythonShell.run('find_balanced_teams.py', options, function (err, results) {
-      if(err) throw err;
-      indices = JSON.parse(results[0]);
-      var balancedPlayers = [];
-      _.each(indices, function (index) {
-        balancedPlayers.push(lobbyObject.players[index]);
-      });
-      lobbyObject.players = balancedPlayers;
-      lobbyObject.inProgress = true;
-      //tell the client we successfully balanced the lobby. They can get the results with the 
-      //get api call. If it's possible to cache the results of this api call we just send only
-      //the data that was changed in this one, rather than getting the whole lobby again.
-      res.status(200).json(true);
-    });
-
-  },
   
+    Rating.find({
+      'userid': { $in: lobbyObject.players}
+    }, function (err, ratings) {
+      //every two numbers in our args array corresponds to a player's 
+      //mu and sigma respectively. 
+      _.each(lobbyObject.players, function (userid, index) {
+        var rating = ratings[index];
+        options.args.push(rating.mu);
+        options.args.push(rating.sigma);
+      });
+
+      var indices = [];
+
+      PythonShell.run('find_balanced_teams.py', options, function (err, results) {
+        if(err) throw err;
+        indices = JSON.parse(results[0]);
+        var balancedPlayers = [];
+        _.each(indices, function (index) {
+          balancedPlayers.push(lobbyObject.players[index]);
+        });
+        lobbyObject.players = balancedPlayers;
+        lobbyObject.inProgress = true;
+        //tell the client we successfully balanced the lobby. They can get the results with the 
+        //get api call. If it's possible to cache the results of this api call we just send only
+        //the data that was changed in this one, rather than getting the whole lobby again.
+        res.status(200).json(true);
+      });
+    });
+  },
+
   voteWinner: function (req, res, next) {
     //for now, only 1 vote is needed to declare a winner. In the future, winner
     //will be decided by majority vote.
@@ -204,22 +212,30 @@ module.exports = {
     }; 
     //every two numbers in our args array corresponds to a player's 
     //mu and sigma respectively. 
-    _.each(players, function (userid) {
-      var rating = Rating.get(userid);
-      options.args.push(rating.mu);
-      options.args.push(rating.sigma);
-    });
-    
-    PythonShell.run('recalculate_ratings.py', options, function (err, results) {
-      if(err) throw err;
-      newRatings = results[0];
-      console.log(results[0]);
-      _.each(newRatings, function (rating, index) {
-        Rating.update(players[index], rating);
+    Rating.find({
+      'userid': { $in: lobbies[req.session.lobby].players}
+    }, function (err, ratings) {
+      //every two numbers in our args array corresponds to a player's 
+      //mu and sigma respectively. 
+      _.each(players, function (userid, index) {
+        var rating = ratings[index];
+        options.args.push(rating.mu);
+        options.args.push(rating.sigma);
       });
-      //later we will close the lobby after the vote, but for now keeping it open makes it easier
-      //to see results
-      res.status(200).json(true);
+
+      PythonShell.run('recalculate_ratings.py', options, function (err, results) {
+        if(err) throw err;
+        newRatings = JSON.parse(results[0]);
+        console.log(newRatings.length);
+        _.each(newRatings, function (rating, index) {
+          ratings[index].mu = rating.mu;
+          ratings[index].sigma = rating.sigma;
+          ratings[index].save();
+        });
+        //later we will close the lobby after the vote, but for now keeping it open makes it easier
+        //to see results
+        res.status(200).json(true);
+      });
     });
   },
   disconnect: function(lobby, id) {

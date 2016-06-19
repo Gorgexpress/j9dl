@@ -1,7 +1,7 @@
 var express = require('express');
 var http = require('http');
 var path = require('path');
-
+var mongoose = require('mongoose');
 var app = express();
 var server = http.Server(app);
 var port = process.env.PORT || 3000;
@@ -13,6 +13,7 @@ io.use(function(socket, next) {
   middleware(socket.request, socket.request.res, next);
 });
 
+mongoose.connect('mongodb://localhost/test');
 var controllers = require('./api/lobby/lobby.controller');
 require('./routes.js')(app);
 app.use(express.static(path.join(__dirname, '../client')));
