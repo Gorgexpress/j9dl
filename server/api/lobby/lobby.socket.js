@@ -1,3 +1,5 @@
+var LobbyEvents = require('./lobby.events');
+
 module.exports = function(io, socket) {
   'use strict';
   socket.on('l:new', function(lobby) {
@@ -33,4 +35,20 @@ module.exports = function(io, socket) {
   socket.on('l:unready', function (userid) {
     io.to(socket.room).emit('l:unready', userid);
   });
+  
+  var listener = createListener('l:disband', socket);
+  LobbyEvents.on('l:disband', listener);
+  socket.on('disconnect', removeListener('l:disband', listener));
+};
+
+var createListener = function (event, socket) {
+  return function (doc) {
+    socket.emit(event, doc);
+  };
+};
+
+var removeListener = function (event, listener) {
+  return function () {
+    LobbyEvents.removeListener(event, listener);
+  };
 };

@@ -15,9 +15,6 @@ app.get('/', function(req, res, next) {
 });
 //TODO put remaining logic below in controllers
 app.use('/api/lobbies', require('./api/lobby'));
-app.get('/api/user/list', function(req, res, next){
-  res.status(200).json(User.listOnline());
-});
 app.get('/api/user/self', function(req, res, next) {
   var self = {};
   self.name = req.session.name;

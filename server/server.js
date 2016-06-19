@@ -14,7 +14,6 @@ io.use(function(socket, next) {
 });
 
 var controllers = require('./api/lobby/lobby.controller');
-controllers.init(io);
 require('./routes.js')(app);
 app.use(express.static(path.join(__dirname, '../client')));
 server.listen(port, function() {

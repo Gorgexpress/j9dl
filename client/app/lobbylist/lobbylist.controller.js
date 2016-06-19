@@ -58,9 +58,15 @@ angular.module('myApp')
     Socket.on('l:new', function (lobby) {
       $scope.lobbies.push(lobby);
     });
-    Socket.on('lobby ended', function(lobby) {
+    Socket.on('l:disband', function(lobby) {
       var index = $scope.lobbies.indexOf(lobby);
       $scope.lobbies.splice(index, 1);
+      //if currently viewed lobby was disbanded, set that value to null
+      if ($scope.$parent.lobby == lobby)
+        $scope.$parent.lobby = null;
+      //same for lobby the client is currently in
+      if ($scope.$parent.self.lobby == lobby)
+        $scope.$parent.self.lobby = null;
     });
 
     $scope.lobbies = [];

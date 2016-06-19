@@ -1,8 +1,8 @@
 var OnlineUser = require('../user/user.controller.js');
 var Rating = require('../rating/rating.controller.js');
 var PythonShell = require('python-shell');
+var LobbyEvents = require('./lobby.events');
 var _ = require('lodash');
-var sio = null; //TODO move the necessary socket io code from here into the client
 //TODO 95% of the controller logic ended up here.. should structure the api a different way.
 lobbies = {
   '-APEM pros only': {
@@ -22,10 +22,6 @@ lobbies = {
 };
 
 module.exports = {
-  init: function(io) {
-    sio = io;
-  },
-
   list: function(req, res, next) {
     res.status(200).json(Object.keys(lobbies));
   },
@@ -95,7 +91,7 @@ module.exports = {
       else if (lobbyData.host === req.session.userid){ //disband lobby if the host left
         delete lobbies[lobby];
         res.status(200).json("Lobby disbanded");
-        sio.sockets.emit('lobby ended', lobby);
+        LobbyEvents.emit('l:disband', lobby);
       }
       else {
         var index = lobbyData.players.indexOf(req.session.userid);
@@ -107,7 +103,7 @@ module.exports = {
         if(lobbyData.players.length === 0){ //if lobby is now empty, remove it.
           delete lobbies[lobby];
           res.status(200).json("Lobby disbanded");
-          sio.sockets.emit('lobby ended', lobby);
+          LobbyEvents.emit('l:disband', lobby);
         }
         else
           res.status(200).json({});
