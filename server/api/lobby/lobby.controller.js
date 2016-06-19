@@ -1,5 +1,5 @@
-var OnlineUser = require('./user.controller.js');
-var Rating = require('./rating.controller.js');
+var OnlineUser = require('../user/user.controller.js');
+var Rating = require('../rating/rating.controller.js');
 var PythonShell = require('python-shell');
 var _ = require('lodash');
 var sio = null; //TODO move the necessary socket io code from here into the client

@@ -1,7 +1,7 @@
 var usernum = 1;
-var User = require('./api/user.controller.js');
-var Rating = require('./api/rating.controller.js');
-module.exports = function(app, controllers) {
+var User = require('./api/user/user.controller.js');
+var Rating = require('./api/rating/rating.controller.js');
+module.exports = function(app) {
   /* GET home page. */
 
 app.get('/', function(req, res, next) {
@@ -14,14 +14,7 @@ app.get('/', function(req, res, next) {
   }
 });
 //TODO put remaining logic below in controllers
-app.get('/api/lobbies/list', controllers.list);
-app.get('/api/lobbies/get/:lobby', controllers.get);
-app.get('/api/lobbies/join/:lobby', controllers.join);
-app.get('/api/lobbies/leave', controllers.leave);
-app.get('/api/lobbies/ready', controllers.ready.bind(controllers));
-app.get('/api/lobbies/unready', controllers.unready);
-app.get('/api/lobbies/start', controllers.start);
-app.get('/api/lobbies/voteWinner/:winner', controllers.voteWinner);
+app.use('/api/lobbies', require('./api/lobby'));
 app.get('/api/user/list', function(req, res, next){
   res.status(200).json(User.listOnline());
 });
@@ -33,7 +26,6 @@ app.get('/api/user/self', function(req, res, next) {
   res.status(200).json(self);
 });
 
-app.post('/api/lobbies/create/:name', controllers.create);
 
 app.get('/login', function(req, res, next) {
   res.sendFile(app.get('clientPath') + 'login.html');

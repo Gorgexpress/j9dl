@@ -1,4 +1,4 @@
-var Lobby = require('../api/lobby.controller.js');
+var Lobby = require('../api/lobby/lobby.controller.js');
 var sockets = {}; //maps session.userid to socket.id
 
 var onConnect = function (io, socket) {

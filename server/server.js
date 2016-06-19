@@ -13,9 +13,9 @@ io.use(function(socket, next) {
   middleware(socket.request, socket.request.res, next);
 });
 
-var controllers = require('./api/lobby.controller');
+var controllers = require('./api/lobby/lobby.controller');
 controllers.init(io);
-require('./routes.js')(app, controllers);
+require('./routes.js')(app);
 app.use(express.static(path.join(__dirname, '../client')));
 server.listen(port, function() {
   console.log('listening on 3000');
