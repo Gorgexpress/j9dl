@@ -13,8 +13,8 @@ angular.module('myApp')
         $scope.newLobbyName = "";
         LobbyList.createLobby(name).then( function (response) {
           $scope.lobbies.push(name);
-          Socket.emit('new lobby', name);
-          Socket.emit('join lobby', name);
+          Socket.emit('l:new', name);
+          Socket.emit('l:join', name);
           $scope.lobbyButtonText = "Leave Lobby";
           $scope.inLobby = true;
           $scope.activeBtn = $scope.lobbies.indexOf(name);
@@ -30,7 +30,7 @@ angular.module('myApp')
       else {
         //code to leave lobby 
         LobbyList.leaveLobby();
-        Socket.emit('leave lobby', name);
+        Socket.emit('l:left', name);
         $scope.lobbyButtonText = "Create Lobby";
         $scope.inLobby = false;
         $scope.activeBtn = -1;
@@ -42,7 +42,7 @@ angular.module('myApp')
         LobbyList.joinLobby(lobby).then(function (response) {
           $scope.inLobby = true;
           $scope.lobbyButtonText = "Leave Lobby";
-          Socket.emit('join lobby', lobby);
+          Socket.emit('l:join', lobby);
           $scope.activeBtn = index;
           $scope.$parent.lobby = lobby;
         }, function (response) {
@@ -55,7 +55,7 @@ angular.module('myApp')
         $scope.$parent.lobby = lobby;
       }
     };
-    Socket.on('new lobby', function (lobby) {
+    Socket.on('l:new', function (lobby) {
       $scope.lobbies.push(lobby);
     });
     Socket.on('lobby ended', function(lobby) {

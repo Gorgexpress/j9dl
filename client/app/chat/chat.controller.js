@@ -5,9 +5,9 @@ angular.module('myApp')
     };*/
 
 $scope.sendMessage = function(msg){
-  Socket.emit('msg',msg);
+  Socket.emit('c:msg',msg);
 };
-Socket.on('msg', function(msg) {
+Socket.on('c:msg', function(msg) {
     if ($scope.messages.length > 5 )//may want to use a diff queue implementation
     $scope.messages.shift(); //that avoids shift
     $scope.messages.push(msg);

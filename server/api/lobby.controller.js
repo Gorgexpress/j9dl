@@ -56,7 +56,6 @@ module.exports = {
       'order': playerIds //ordered array of ids, as objects are unordered and ordering is important
     };                   //important because order determines which team a player is on. TODO find a better way to do this?
     playerIds.forEach(function(id) {
-      console.log(id);
       lobbyObject.users[id] = {
         'name': OnlineUser.getName(id),
         'role': 0,

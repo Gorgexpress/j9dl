@@ -1,6 +1,11 @@
 var Lobby = require('../api/lobby.controller.js');
 var sockets = {}; //maps session.userid to socket.id
 
+var onConnect = function (io, socket) {
+  require('../api/chat/chat.socket')(io, socket);
+  require('../api/lobby/lobby.socket')(io, socket);
+};
+
 module.exports = function(server){
   var io = require('socket.io')(server);
 
@@ -12,39 +17,7 @@ module.exports = function(server){
     socket.on('new lobby', function(lobby) {
       socket.broadcast.emit('new lobby', lobby);
     });
-    socket.on('join lobby', function(lobby) {
-      if (socket.room){
-        socket.leave(socket.room);
-        socket.broadcast.emit('user left', socket.request.session.userid);
-      }
-      socket.join(lobby);
-      socket.room = lobby;
-      var user = {
-        'id': socket.request.session.userid,
-        'name': socket.request.session.name,
-        'role': 0
-      };
-      io.to(lobby).emit('user joined', user);
-    });
-    socket.on('leave lobby', function() {
-      if (socket.room){
-        socket.leave(socket.room);
-        socket.room = null;
-        socket.broadcast.emit('user left', socket.request.session.userid);
-      }
-    });
-    socket.on('lobby started', function() {
-      io.to(socket.room).emit('lobby started');
-    });
-    socket.on('msg', function(msg) {
-      io.emit('msg', socket.request.session.name + ": " + msg);
-    });
-    socket.on('user ready', function (userid) {
-      io.to(socket.room).emit('user ready', userid);
-    });
-    socket.on('user unready', function (userid) {
-      io.to(socket.room).emit('user unready', userid);
-    });
+    onConnect(io, socket);
     socket.on('disconnect', function() {
       if (socket.room) 
         Lobby.disconnect(socket.request.session.lobby, socket.request.session.userid);

@@ -30,7 +30,7 @@ angular.module('myApp')
       if (!$scope.ready) {
         LobbyInfo.ready()
           .then(function (response) {
-            Socket.emit('user ready', $scope.$parent.self.userid);
+            Socket.emit('l:ready', $scope.$parent.self.userid);
             $scope.readyButtonText = "Unready";
             $scope.disableReadyButton = true;
             $scope.ready = true;
@@ -42,7 +42,7 @@ angular.module('myApp')
       else {
         LobbyInfo.unready()
           .then(function (response) {
-            Socket.emit('user unready', $scope.$parent.self.userid);
+            Socket.emit('l:unready', $scope.$parent.self.userid);
             $scope.readyButtonText = "Ready";
             $scope.disableReadyButton = true;
             $scope.ready = false;
@@ -62,7 +62,7 @@ angular.module('myApp')
 
         });
     };
-    Socket.on('user joined', function(user) {
+    Socket.on('l:join', function(user) {
       $scope.lobbyInfo.users[user.id] = {
         'name': user.name,
         'role': user.role
@@ -72,7 +72,7 @@ angular.module('myApp')
       if (Object.keys($scope.lobbyInfo.users).length == 2)
         $scope.lobbyFull = true;
     });
-    Socket.on('user left', function(user) {
+    Socket.on('l:left', function(user) {
       if ($scope.lobbyInfo.users[user])
         delete $scope.lobbyInfo.users[user];
       if ($scope.lobbyFull) {
@@ -87,7 +87,7 @@ angular.module('myApp')
       }
     });
 
-    Socket.on('user ready', function(userid) {
+    Socket.on('l:ready', function(userid) {
       $scope.lobbyInfo.users[userid].ready = true;
       $scope.lobbyInfo.readyCount++;
       //if everyone is ready, refresh lobby info as teams will be balanced.
@@ -95,11 +95,11 @@ angular.module('myApp')
         refreshLobbyUserList($scope.$parent.lobby);
       }
     });
-    Socket.on('user unready', function(userid) {
+    Socket.on('l:unready', function(userid) {
       $scope.lobbyInfo.readyCount--;
       $scope.lobbyInfo.users[userid].ready = false;
     });
-    Socket.on('lobby started', function() {
+    Socket.on('l:start', function() {
       refreshLobbyUserList($scope.$parent.lobby);
     });
     $scope.lobbyInfo = {
@@ -116,8 +116,12 @@ angular.module('myApp')
     var timeoutPromise = null; 
     refreshLobbyUserList($scope.$parent.lobby);
     $scope.$on('$destroy', function (event) {
-      Socket.removeAllListeners('user joined');
-      Socket.removeAllListeners('user left');
+      Socket.removeAllListeners('l:joined');
+      Socket.removeAllListeners('l:left');
+      Socket.removeAllListeners('l:ready');
+      Socket.removeAllListeners('l:unready');
+      Socket.removeAllListeners('l:unready');
+
     });
 
   });
