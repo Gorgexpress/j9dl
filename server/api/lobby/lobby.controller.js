@@ -55,6 +55,10 @@ module.exports = {
       'userid': { $in: playerIds}
     }, function (err, ratings) {
       playerIds.forEach(function(id, index) {
+        if (!ratings[index]) {
+          ratings[index] = new Rating({userid: id});
+          ratings[index].save();
+        }
         lobbyObject.users[id] = {
           'name': OnlineUser.getName(id),
           'role': 0,
@@ -178,10 +182,13 @@ module.exports = {
       //mu and sigma respectively. 
       _.each(lobbyObject.players, function (userid, index) {
         var rating = ratings[index];
+        if (!rating) {
+          rating = new Rating({'userid': userid});
+          rating.save();
+        }
         options.args.push(rating.mu);
         options.args.push(rating.sigma);
       });
-
       var indices = [];
 
       PythonShell.run('find_balanced_teams.py', options, function (err, results) {
@@ -205,9 +212,10 @@ module.exports = {
     //for now, only 1 vote is needed to declare a winner. In the future, winner
     //will be decided by majority vote.
     var players = lobbies[req.session.lobby].players;
-    var rankings = req.params.winner === 0 ? [0, 1] : [1, 0];
+    var rankings = req.params.winner == '0' ? [0, 1] : [1, 0];
+    console.log(lobbies[req.session.lobby].players);
     var options = {
-      args: [rankings],
+      args: [rankings[0], rankings[1]],
       scriptPath: './server/components/matchmaking'
     }; 
     //every two numbers in our args array corresponds to a player's 
@@ -222,18 +230,17 @@ module.exports = {
         options.args.push(rating.mu);
         options.args.push(rating.sigma);
       });
-
       PythonShell.run('recalculate_ratings.py', options, function (err, results) {
         if(err) throw err;
         newRatings = JSON.parse(results[0]);
-        console.log(newRatings.length);
         _.each(newRatings, function (rating, index) {
           ratings[index].mu = rating.mu;
           ratings[index].sigma = rating.sigma;
           ratings[index].save();
         });
-        //later we will close the lobby after the vote, but for now keeping it open makes it easier
-        //to see results
+        //delete lobby
+        delete lobbies[req.session.lobby];
+        LobbyEvents.emit('l:disband', req.session.lobby);
         res.status(200).json(true);
       });
     });

@@ -10,6 +10,8 @@ module.exports = function(server){
   var io = require('socket.io')(server);
 
   io.on('connection', function(socket) {
+    //all sockets from the same session will join a room named after their userid
+    socket.join('u:' + socket.request.session.userid); 
     if (sockets[socket.request.session.userid])
       sockets[socket.request.session.userid].push(socket.id);
     else

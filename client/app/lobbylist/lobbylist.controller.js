@@ -71,7 +71,18 @@ angular.module('myApp')
         $scope.activeBtn = -1;
       }
     });
-
+    Socket.on('l:sjoin', function(lobby) {
+      $scope.inLobby = true;
+      $scope.lobbyButtonText = "Leave Lobby";
+      $scope.activeBtn = $scope.lobbies.indexOf(lobby);
+      $scope.$parent.lobby = lobby;
+    });
+    Socket.on('l:sleave', function(lobby) {
+      $scope.inLobby = false;
+      $scope.lobbyButtonText = "Create Lobby";
+      $scope.activeBtn = -1;
+      $scope.$parent.lobby = null;
+    });
     $scope.lobbies = [];
     $scope.lobbyButtonText = "Create Lobby";
     $scope.inLobby = false;

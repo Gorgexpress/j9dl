@@ -10,20 +10,24 @@ module.exports = function(io, socket) {
       socket.leave(socket.room);
       socket.broadcast.emit('l:left', socket.request.session.userid);
     }
-    socket.join(lobby);
-    socket.room = lobby;
+    socket.join('l:' + lobby);
+    socket.room = 'l:' + lobby;
     var user = {
       'id': socket.request.session.userid,
       'name': socket.request.session.name,
       'role': 0
     };
-    io.to(lobby).emit('l:join', user);
+    io.to(socket.room).emit('l:join', user);
+    //sync join with other sockets in the same session
+    socket.broadcast.to('u:' + socket.request.session.userid).emit('l:sjoin', lobby);
   });
   socket.on('l:left', function() {
     if (socket.room){
       socket.leave(socket.room);
       socket.room = null;
       socket.broadcast.emit('l:left', socket.request.session.userid);
+      //sync leave with other sockets in the same session
+      socket.broadcast.to('u:' + socket.request.session.userid).emit('l:sleave');
     }
   });
   socket.on('l:start', function() {
@@ -35,7 +39,7 @@ module.exports = function(io, socket) {
   socket.on('l:unready', function (userid) {
     io.to(socket.room).emit('l:unready', userid);
   });
-  
+
   var listener = createListener('l:disband', socket);
   LobbyEvents.on('l:disband', listener);
   socket.on('disconnect', removeListener('l:disband', listener));

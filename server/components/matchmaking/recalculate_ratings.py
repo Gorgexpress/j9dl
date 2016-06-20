@@ -32,4 +32,9 @@ for mu, sigma in izip(r1, r2):
 
 #print results so the node.js code can grab it
 print json.dumps(new_ratings_json)
+print rankings
+print team1
+print team2
+print r1
+print r2
 
