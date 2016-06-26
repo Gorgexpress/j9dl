@@ -5,7 +5,8 @@ angular.module('myApp')
         LobbyInfo.get(lobby)
           .then(function(response){ 
             $scope.lobbyInfo = response.data;
-            if ($scope.lobbyInfo.users[$scope.$parent.self.name])
+            console.log($scope.lobbyInfo.users);
+            if ($scope.lobbyInfo.users[$scope.$parent.self.userid])
               $scope.showButtons = true;
             if ($scope.lobbyInfo.host === $scope.$parent.self.userid)
               $scope.isHost = true;
@@ -34,6 +35,7 @@ angular.module('myApp')
             $scope.readyButtonText = "Unready";
             $scope.disableReadyButton = true;
             $scope.ready = true;
+            $scope.lobbyInfo.readyCount++;
             timeoutPromise = $timeout(reenableReadyButtonCallback, 3000);         
           }, function (response) {
             alert(response); 
@@ -46,6 +48,7 @@ angular.module('myApp')
             $scope.readyButtonText = "Ready";
             $scope.disableReadyButton = true;
             $scope.ready = false;
+            $scope.lobbyInfo.readyCount--;
             timeoutPromise = $timeout(reenableReadyButtonCallback, 3000);
           }, function (response) {
             alert(response);
@@ -71,6 +74,8 @@ angular.module('myApp')
         $scope.showButtons = true;
       if (Object.keys($scope.lobbyInfo.users).length == 2)
         $scope.lobbyFull = true;
+      console.log($scope.lobbyFull);
+      console.log($scope.showButtons);
     });
     Socket.on('l:left', function(user) {
       if ($scope.lobbyInfo.users[user])
@@ -90,14 +95,28 @@ angular.module('myApp')
     Socket.on('l:ready', function(userid) {
       $scope.lobbyInfo.users[userid].ready = true;
       $scope.lobbyInfo.readyCount++;
+      //sync between different sockets on the same session
+      if ($scope.$parent.self.userid === userid) {
+        $scope.readyButtonText = "Unready";
+        $scope.disableReadyButton = true;
+        $scope.ready = true;
+        timeoutPromise = $timeout(reenableReadyButtonCallback, 3000);   
+      }
       //if everyone is ready, refresh lobby info as teams will be balanced.
-      if (Object.keys($scope.lobbyInfo.users).length == $scope.lobbyInfo.readyCount){
+      if (Object.keys($scope.lobbyInfo.users).length <= $scope.lobbyInfo.readyCount){
         refreshLobbyUserList($scope.$parent.lobby);
       }
     });
     Socket.on('l:unready', function(userid) {
       $scope.lobbyInfo.readyCount--;
       $scope.lobbyInfo.users[userid].ready = false;
+      //sync between different sockets on the same session
+      if ($scope.$parent.self.userid === userid) {
+        $scope.readyButtonText = "Ready";
+        $scope.disableReadyButton = true;
+        $scope.ready = false;
+        timeoutPromise = $timeout(reenableReadyButtonCallback, 3000);
+      }
     });
     Socket.on('l:start', function() {
       refreshLobbyUserList($scope.$parent.lobby);
@@ -120,7 +139,7 @@ angular.module('myApp')
       Socket.removeAllListeners('l:left');
       Socket.removeAllListeners('l:ready');
       Socket.removeAllListeners('l:unready');
-      Socket.removeAllListeners('l:unready');
+      Socket.removeAllListeners('l:start');
 
     });
 

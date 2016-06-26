@@ -4,6 +4,7 @@ var PythonShell = require('python-shell');
 var LobbyEvents = require('./lobby.events');
 var _ = require('lodash');
 //TODO 95% of the controller logic ended up here.. should structure the api a different way.
+/*
 lobbies = {
   '-APEM pros only': {
     'players': [20],
@@ -20,7 +21,8 @@ lobbies = {
     'ready': [25]
   }
 };
-
+*/
+var lobbies= {};
 module.exports = {
   list: function(req, res, next) {
     res.status(200).json(Object.keys(lobbies));

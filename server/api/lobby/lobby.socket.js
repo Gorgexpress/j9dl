@@ -34,10 +34,10 @@ module.exports = function(io, socket) {
     io.to(socket.room).emit('l:start');
   });
   socket.on('l:ready', function (userid) {
-    io.to(socket.room).emit('l:ready', userid);
+    socket.broadcast.to(socket.room).emit('l:ready', userid);
   });
   socket.on('l:unready', function (userid) {
-    io.to(socket.room).emit('l:unready', userid);
+    socket.broadcast.to(socket.room).emit('l:unready', userid);
   });
 
   var listener = createListener('l:disband', socket);

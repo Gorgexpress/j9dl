@@ -1,9 +1,11 @@
 var User = require('./user.model');
-
+/*
 var users = {
   20: 'Deadprez',
   25: 'vlv'
 };
+*/
+var users = {};
 
 module.exports = {
   getSelf: function(req, res, next) {
