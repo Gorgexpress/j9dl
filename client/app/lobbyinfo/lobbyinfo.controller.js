@@ -10,7 +10,7 @@ angular.module('myApp')
               $scope.showButtons = true;
             if ($scope.lobbyInfo.host === $scope.$parent.self.userid)
               $scope.isHost = true;
-            if ($scope.lobbyInfo.users.length >= 2)
+            if ($scope.lobbyInfo.users.length >= 4)
               $scope.lobbyFull = true;
           }, function (response) {
             $scope.lobbyInfo.users = [];
@@ -68,11 +68,12 @@ angular.module('myApp')
     Socket.on('l:join', function(user) {
       $scope.lobbyInfo.users[user.id] = {
         'name': user.name,
-        'role': user.role
+        'role': user.role,
+        'mu': user.mu
       };
       if(user.id === $scope.$parent.self.userid && $scope.lobbyInfo.users[user.id])
         $scope.showButtons = true;
-      if (Object.keys($scope.lobbyInfo.users).length == 2)
+      if (Object.keys($scope.lobbyInfo.users).length == 4)
         $scope.lobbyFull = true;
       console.log($scope.lobbyFull);
       console.log($scope.showButtons);

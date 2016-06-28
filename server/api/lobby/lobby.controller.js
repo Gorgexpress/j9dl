@@ -25,7 +25,11 @@ lobbies = {
 var lobbies= {};
 module.exports = {
   list: function(req, res, next) {
-    res.status(200).json(Object.keys(lobbies));
+    var list = {};
+    _.each(Object.keys(lobbies), function (name) {
+      list[name] = lobbies[name].players.length;
+    });
+    res.status(200).json(list);
   },
 
   create: function(req, res, next) {

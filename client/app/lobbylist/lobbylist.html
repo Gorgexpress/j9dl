@@ -1,6 +1,6 @@
 <div class="panel panel-default" style="overflow-y: scroll;height: 100%;">
   <div class="btn-group-vertical" style="width:100%;"> 
-    <button ng-repeat="lobby in lobbies track by $index" type="button" class="btn btn-primary" ng-class="{'btn btn-primary': activeBtn != $index, 'btn btn-success': activeBtn == $index}" ng-click="viewLobby(lobby, $index)" ng-dblclick="joinLobby(lobby, $index)" style="width:100%;"> {{ lobby }}</button>
+    <button ng-repeat="(name, count) in lobbies" type="button" class="btn btn-primary" ng-class="{'btn btn-primary': activeBtn != name, 'btn btn-success': activeBtn == name}" ng-click="viewLobby(name)" ng-dblclick="joinLobby(name)" style="width:100%;"> {{ name }} {{ count }}/4</button>
   </div>
   <input type="text" ng-disabled="inLobby" ng-model="newLobbyName" class="form-control" ng-model="inputText">
   <button type="button" ng-disabled="newLobbyName == '' && !inLobby" class="btn btn-primary" ng-class="{'btn btn-primary': !inLobby, 'btn btn-danger': inLobby}" ng-click="createGame(newLobbyName)" style="width:100%;">{{ lobbyButtonText }}</button>

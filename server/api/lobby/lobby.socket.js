@@ -1,4 +1,5 @@
 var LobbyEvents = require('./lobby.events');
+var Rating = require('../rating/rating.model.js');
 
 module.exports = function(io, socket) {
   'use strict';
@@ -12,14 +13,17 @@ module.exports = function(io, socket) {
     }
     socket.join('l:' + lobby);
     socket.room = 'l:' + lobby;
-    var user = {
-      'id': socket.request.session.userid,
-      'name': socket.request.session.name,
-      'role': 0
-    };
-    io.to(socket.room).emit('l:join', user);
-    //sync join with other sockets in the same session
-    socket.broadcast.to('u:' + socket.request.session.userid).emit('l:sjoin', lobby);
+    Rating.findOne({'userid': socket.request.session.userid}, function (err, rating) {
+      var user = {
+        'id': socket.request.session.userid,
+        'name': socket.request.session.name,
+        'role': 0,
+        'mu': rating.mu
+      };
+      io.to(socket.room).emit('l:join', user);
+      //sync join with other sockets in the same session
+      socket.broadcast.to('u:' + socket.request.session.userid).emit('l:sjoin', lobby);
+    });
   });
   socket.on('l:left', function() {
     if (socket.room){
@@ -39,7 +43,12 @@ module.exports = function(io, socket) {
   socket.on('l:unready', function (userid) {
     socket.broadcast.to(socket.room).emit('l:unready', userid);
   });
-
+  socket.on('l:incCount', function (lobby) {
+    io.emit('l:incCount', lobby);
+  });
+  socket.on('l:decCount', function (lobby) {
+    io.emit('l:decCount', lobby);
+  });
   var listener = createListener('l:disband', socket);
   LobbyEvents.on('l:disband', listener);
   socket.on('disconnect', removeListener('l:disband', listener));
