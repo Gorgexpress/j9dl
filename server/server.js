@@ -5,7 +5,7 @@ var mongoose = require('mongoose');
 var app = express();
 var server = http.Server(app);
 var port = process.env.PORT || 3000;
-
+var mongoURI = process.env.MONGODB_URI || 'mongodb://localhost/test';
 var io = require('./config/socket.io.js')(server);
 var middleware = require('./config/express')(app);
 
@@ -13,7 +13,7 @@ io.use(function(socket, next) {
   middleware(socket.request, socket.request.res, next);
 });
 
-mongoose.connect('mongodb://localhost/test');
+mongoose.connect(mongoURI);
 var controllers = require('./api/lobby/lobby.controller');
 require('./routes.js')(app);
 app.use(express.static(path.join(__dirname, '../client')));
