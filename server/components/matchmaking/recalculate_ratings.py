@@ -1,7 +1,7 @@
 import trueskill
 
 import sys, json
-from itertools import izip
+from itertools import chain
 
 #team rankings are always the first two args
 rankings = [sys.argv[1], sys.argv[2]] 
@@ -19,22 +19,17 @@ for i in xrange(3 + (len(sys.argv) - 3) // 2, len(sys.argv), 2):
 
 #calculate new rankings. Documentation says teams have to be tuples or dictionaries
 rated_rating_groups = trueskill.rate([tuple(team1), tuple(team2)], ranks=rankings)
-(r1,), (r2,) = rated_rating_groups
+r1, r2 = rated_rating_groups
 
 #setup a json, consisting of a list of dictionaries, with the results
 new_ratings_json = []
 
-for mu, sigma in izip(r1, r2):
+for rating in chain(r1, r2):
     new_ratings_json.append({
-        'mu': mu,
-        'sigma': sigma
+        'mu': rating.mu,
+        'sigma': rating.sigma
     }) 
 
 #print results so the node.js code can grab it
 print json.dumps(new_ratings_json)
-print rankings
-print team1
-print team2
-print r1
-print r2
 

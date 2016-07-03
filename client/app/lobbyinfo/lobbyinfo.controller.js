@@ -5,7 +5,6 @@ angular.module('myApp')
         LobbyInfo.get(lobby)
           .then(function(response){ 
             $scope.lobbyInfo = response.data;
-            console.log($scope.lobbyInfo.users);
             if ($scope.lobbyInfo.users[$scope.$parent.self.userid])
               $scope.showButtons = true;
             if ($scope.lobbyInfo.host === $scope.$parent.self.userid)
@@ -36,6 +35,11 @@ angular.module('myApp')
             $scope.disableReadyButton = true;
             $scope.ready = true;
             $scope.lobbyInfo.readyCount++;
+            //if everyone is ready, refresh lobby info as teams will be balanced.
+            if (Object.keys($scope.lobbyInfo.users).length <= $scope.lobbyInfo.readyCount){
+              $scope.$parent.self.inActiveLobby = true;
+              refreshLobbyUserList($scope.$parent.lobby);
+            }
             timeoutPromise = $timeout(reenableReadyButtonCallback, 3000);         
           }, function (response) {
             alert(response); 
@@ -58,9 +62,14 @@ angular.module('myApp')
 
     //vote for winner after a game is finished
     $scope.voteWinner = function(winner) {
-      LobbyInfo.voteWinner(0)
+      LobbyInfo.voteWinner(winner)
         .then(function (response) {
-          refreshLobbyUserList(); //just update lobby info for now
+          $scope.votes[winner]++;
+          if($scope.votes[winner] >= $scope.lobbyInfo.users.length / 2){
+            $scope.$parent.self.inActiveLobby = false;
+            refreshLobbyUserList();
+          }
+
         }, function (response) {
 
         });
@@ -75,8 +84,6 @@ angular.module('myApp')
         $scope.showButtons = true;
       if (Object.keys($scope.lobbyInfo.users).length == 4)
         $scope.lobbyFull = true;
-      console.log($scope.lobbyFull);
-      console.log($scope.showButtons);
     });
     Socket.on('l:left', function(user) {
       if ($scope.lobbyInfo.users[user])
@@ -105,6 +112,7 @@ angular.module('myApp')
       }
       //if everyone is ready, refresh lobby info as teams will be balanced.
       if (Object.keys($scope.lobbyInfo.users).length <= $scope.lobbyInfo.readyCount){
+        $scope.$parent.self.inActiveLobby = true;
         refreshLobbyUserList($scope.$parent.lobby);
       }
     });
@@ -131,6 +139,10 @@ angular.module('myApp')
     $scope.ready = false;
     $scope.disableReadyButton = false;
     $scope.readyButtonText = "Ready";
+    $scope.votes = {
+      0: 0,
+      1: 0
+    };
 
     //holds the promose from our $timeout call so we can cancel it if necessary
     var timeoutPromise = null; 

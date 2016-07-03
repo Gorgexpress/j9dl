@@ -1,6 +1,7 @@
 var usernum = 1;
 var User = require('./api/user/user.controller.js');
 var Rating = require('./api/rating/rating.controller.js');
+var Lobby = require('./api/lobby/lobby.controller');
 module.exports = function(app) {
   /* GET home page. */
 
@@ -20,6 +21,7 @@ app.get('/api/user/self', function(req, res, next) {
   self.name = req.session.name;
   self.userid = req.session.userid;
   self.lobby = req.session.lobby;
+  self.inActiveLobby = Lobby.isActiveLobby(req.session.lobby);
   res.status(200).json(self);
 });
 

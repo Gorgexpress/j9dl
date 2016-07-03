@@ -12,7 +12,7 @@ angular.module('myApp')
       if (!$scope.inLobby) {
         $scope.newLobbyName = "";
         LobbyList.createLobby(name).then( function (response) {
-          $scope.lobbies[name] = 1;
+          $scope.lobbies[name] = 0;
           Socket.emit('l:new', name);
           Socket.emit('l:join', name);
           $scope.lobbyButtonText = "Leave Lobby";

@@ -14,6 +14,10 @@ module.exports = function(io, socket) {
     socket.join('l:' + lobby);
     socket.room = 'l:' + lobby;
     Rating.findOne({'userid': socket.request.session.userid}, function (err, rating) {
+      if (!rating) {
+        rating = new Rating({userid: socket.request.session.userid});
+        rating.save();
+      }
       var user = {
         'id': socket.request.session.userid,
         'name': socket.request.session.name,
@@ -23,11 +27,13 @@ module.exports = function(io, socket) {
       io.to(socket.room).emit('l:join', user);
       //sync join with other sockets in the same session
       socket.broadcast.to('u:' + socket.request.session.userid).emit('l:sjoin', lobby);
+      io.emit('l:incCount', lobby); //increase playerCount in lobby list
     });
   });
   socket.on('l:left', function() {
     if (socket.room){
       socket.leave(socket.room);
+      io.emit('l:decCount', socket.room.slice(2)); //decrease playerCount in lobby list, ignore the 'l:'
       socket.room = null;
       socket.broadcast.emit('l:left', socket.request.session.userid);
       //sync leave with other sockets in the same session

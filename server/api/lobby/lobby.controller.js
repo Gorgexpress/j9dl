@@ -1,10 +1,11 @@
 var OnlineUser = require('../user/user.controller.js');
 var Rating = require('../rating/rating.model.js');
+var RatingCtrl = require('../rating/rating.controller.js');
 var PythonShell = require('python-shell');
 var LobbyEvents = require('./lobby.events');
 var _ = require('lodash');
 //TODO 95% of the controller logic ended up here.. should structure the api a different way.
-/*
+
 lobbies = {
   '-APEM pros only': {
     'players': [20],
@@ -14,15 +15,15 @@ lobbies = {
     'ready': []
   },
   'ARDM': {
-    'players': [25],
+    'players': [25, 26, 27],
     'forbid': [2000],
     'host': [25],
     'inProgress': false,
-    'ready': [25]
+    'ready': [25, 26, 27]
   }
 };
-*/
-var lobbies= {};
+
+//var lobbies= {};
 module.exports = {
   list: function(req, res, next) {
     var list = {};
@@ -56,7 +57,7 @@ module.exports = {
       'readyCount': lobbies[req.params.lobby].ready.length,
       'inProgress': lobbies[req.params.lobby].inProgress,
       'order': playerIds //ordered array of ids, as objects are unordered and ordering is important
-    };                   //important because order determines which team a player is on. TODO find a better way to do this?
+    };                   //important because order determines which team a player is on. TODO find a better way to do this
     Rating.find({
       'userid': { $in: playerIds}
     }, function (err, ratings) {
@@ -139,8 +140,9 @@ module.exports = {
     else {
       lobbies[req.session.lobby].ready.push(req.session.userid);
       //if everyone is ready, start the game
-      if (lobbies[req.session.lobby].ready.length === lobbies[req.session.lobby].players.length)
+      if (lobbies[req.session.lobby].ready.length >= lobbies[req.session.lobby].players.length) {
         this.start(req, res, next);
+      }
       else
         res.status(200).json(false);
     }
@@ -167,6 +169,7 @@ module.exports = {
       }
     }
   },
+
 
   start: function (req, res, next) {
     //TODO move some of this code into another file?
@@ -213,7 +216,7 @@ module.exports = {
       });
     });
   },
-
+  
   voteWinner: function (req, res, next) {
     //for now, only 1 vote is needed to declare a winner. In the future, winner
     //will be decided by majority vote.
@@ -256,5 +259,12 @@ module.exports = {
       if (lobbies[lobby].players[id])
         delete lobbies[lobby].players[id];
   },
+
+  isActiveLobby: function(lobby) {
+    if (!lobbies[lobby])
+      return false;
+    else
+      return lobbies[lobby].inProgress;
+  }
 
 };
