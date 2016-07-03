@@ -12,6 +12,7 @@ lobbies = {
     'forbid': [1000],
     'host': [20],
     'inProgress': false,
+    'canVote': false,
     'ready': []
   },
   'ARDM': {
@@ -19,6 +20,7 @@ lobbies = {
     'forbid': [2000],
     'host': [25],
     'inProgress': false,
+    'canVote': false,
     'ready': [25, 26, 27]
   }
 };
@@ -42,6 +44,7 @@ module.exports = {
       'forbid': [],
       'host': req.session.userid,
       'inProgress': false,
+      'canVote': false,
       'ready': []
     };
     req.session.lobby = req.params.name;
@@ -170,7 +173,7 @@ module.exports = {
     }
   },
 
-
+//TODO rewrite using promises and move relevant code to rating controller
   start: function (req, res, next) {
     //TODO move some of this code into another file?
     var lobbyObject = lobbies[req.session.lobby];
@@ -216,13 +219,23 @@ module.exports = {
       });
     });
   },
-  
+  //TODO rewrite using promises and move relevant code to rating controller
+  //lobby controller should only check if the winner has been decided. This check isn't even coded
+  //in yet, but winner should be decided by first team to reach majority vote. Thats the only
+  //part lobby controller should handle.
   voteWinner: function (req, res, next) {
     //for now, only 1 vote is needed to declare a winner. In the future, winner
     //will be decided by majority vote.
+    //Also, we will use the ready array to hold the ids of players who have NOT voted yet
+    //May be better to move to a different array later
+
+    if (lobbies[req.session.lobby].ready.indexOf(req.session.userid) < 0) {
+      res.status(409).json("Already voted");
+      return;
+    }
+    lobbies[req.session.lobby].ready.splice(lobbies[req.session.lobby].ready.indexOf(lobbies[req.session.userid]), 1);
     var players = lobbies[req.session.lobby].players;
     var rankings = req.params.winner == '0' ? [0, 1] : [1, 0];
-    console.log(lobbies[req.session.lobby].players);
     var options = {
       args: [rankings[0], rankings[1]],
       scriptPath: './server/components/matchmaking'
@@ -250,6 +263,7 @@ module.exports = {
         //delete lobby
         delete lobbies[req.session.lobby];
         LobbyEvents.emit('l:disband', req.session.lobby);
+        //remove user from ready array as he or she has already voted 
         res.status(200).json(true);
       });
     });
