@@ -1,5 +1,5 @@
 angular.module('myApp')
-  .controller('LobbyInfoCtrl', function($scope, $timeout, LobbyInfo, Socket) {
+  .controller('LobbyInfoCtrl', function($scope, $timeout, LobbyInfo, Socket, Sound) {
     var refreshLobbyUserList = function(lobby) {
       if (lobby)
         LobbyInfo.get(lobby)
@@ -9,8 +9,10 @@ angular.module('myApp')
               $scope.showButtons = true;
             if ($scope.lobbyInfo.host === $scope.$parent.self.userid)
               $scope.isHost = true;
-            if ($scope.lobbyInfo.users.length >= 4)
+            if ($scope.lobbyInfo.users.length >= 4) {
               $scope.lobbyFull = true;
+              Sound.play('gameIsFull');
+            }
           }, function (response) {
             $scope.lobbyInfo.users = [];
             alert("Could not get lobby: " + response);
@@ -82,8 +84,10 @@ angular.module('myApp')
       };
       if(user.id === $scope.$parent.self.userid && $scope.lobbyInfo.users[user.id])
         $scope.showButtons = true;
-      if (Object.keys($scope.lobbyInfo.users).length == 4)
+      if (Object.keys($scope.lobbyInfo.users).length == 4){
         $scope.lobbyFull = true;
+        Sound.play('gameIsFull');
+      }
     });
     Socket.on('l:left', function(user) {
       if ($scope.lobbyInfo.users[user])

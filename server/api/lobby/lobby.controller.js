@@ -90,11 +90,13 @@ module.exports = {
     else if (req.session.lobby && lobbies[req.session.lobby] && 
              lobbies[req.session.lobby].players.indexOf(req.session.userid) > 0) 
     res.status(500).json("Already in lobby");
-    else {
+    else if (lobbyData.players.length < 4){
       lobbyData.players.push(req.session.userid);
       req.session.lobby = req.params.lobby;
       res.status(200).json("Joined lobby" + req.params.lobby);
     }
+    else
+      return res.status(409).json("Lobby Full");
   },
 
   leave: function(req, res, next) {
@@ -144,7 +146,13 @@ module.exports = {
       lobbies[req.session.lobby].ready.push(req.session.userid);
       //if everyone is ready, start the game
       if (lobbies[req.session.lobby].ready.length >= lobbies[req.session.lobby].players.length) {
-        this.start(req, res, next);
+        //this.start(req, res, next);
+        RatingCtrl.findBalancedTeams(lobbies[req.session.lobby].players)
+        .then(function (result) {
+            lobbies[req.session.lobby].players = result;
+            lobbies[req.session.lobby].inProgress = true;
+            return res.status(200).json(true);
+        });
       }
       else
         res.status(200).json(false);
@@ -173,9 +181,9 @@ module.exports = {
     }
   },
 
-//TODO rewrite using promises and move relevant code to rating controller
+  /* this code has been moved to the rating controller's findBalancedTeams function
+   * can delete this once i know there are no issues due to the change
   start: function (req, res, next) {
-    //TODO move some of this code into another file?
     var lobbyObject = lobbies[req.session.lobby];
     if (lobbyObject.players.length != lobbyObject.ready.length) {
       console.log(req.session.lobby + " tried to start but players and ready array have different values");
@@ -186,7 +194,7 @@ module.exports = {
       args: [],
       scriptPath: './server/components/matchmaking'
     }; 
-  
+
     Rating.find({
       'userid': { $in: lobbyObject.players}
     }, function (err, ratings) {
@@ -218,7 +226,7 @@ module.exports = {
         res.status(200).json(true);
       });
     });
-  },
+  },*/
   //TODO rewrite using promises and move relevant code to rating controller
   //lobby controller should only check if the winner has been decided. This check isn't even coded
   //in yet, but winner should be decided by first team to reach majority vote. Thats the only
@@ -271,7 +279,7 @@ module.exports = {
   disconnect: function(lobby, id) {
     if (lobbies[lobby])
       if (lobbies[lobby].players[id])
-        delete lobbies[lobby].players[id];
+        lobbies[lobby].players.splice(lobbies[lobby].players.indexOf(id), 1);
   },
 
   isActiveLobby: function(lobby) {
