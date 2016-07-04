@@ -1,10 +1,10 @@
 var User = require('./user.model');
 
 var users = {
-  20: 'Deadprez',
-  25: 'vlv',
-  26: 'pojo',
-  27: 'shyrazn'
+  20: {name: 'Deadprez'},
+  25: {name: 'vlv'},
+  26: {name: 'pojo'},
+  27: {name: 'shyrazn'}
 };
 
 //var users = {};
@@ -19,10 +19,13 @@ module.exports = {
     res.status(200).json(self);
   },
   getName: function(id) {
-    return users[id];
+    return users[id].name;
   },
   setName: function(id, name) {
-    users[id] = name;
+    if (users[id])
+      users[id].name = name;
+    else
+      users[id] = {'name': name};
   },
   isOnline: function(id) {
     return users[id] ? true : false;
