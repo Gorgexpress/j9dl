@@ -3,6 +3,7 @@ var Rating = require('../rating/rating.model.js');
 var RatingCtrl = require('../rating/rating.controller.js');
 var PythonShell = require('python-shell');
 var LobbyEvents = require('./lobby.events');
+var User = require('../user/user.controller');
 var _ = require('lodash');
 //TODO 95% of the controller logic ended up here.. should structure the api a different way.
 
@@ -63,8 +64,8 @@ module.exports = {
     };                   //important because order determines which team a player is on. TODO find a better way to do this
     Rating.find({
       'userid': { $in: playerIds}
-    }, function (err, ratings) {
-      playerIds.forEach(function(id, index) {
+    }, null, {sort: {userid: 1}}, function (err, ratings) {
+      _.sortBy(playerIds).forEach(function(id, index) {
         if (!ratings[index]) {
           ratings[index] = new Rating({userid: id});
           ratings[index].save();
@@ -147,6 +148,7 @@ module.exports = {
       //if everyone is ready, start the game
       if (lobbies[req.session.lobby].ready.length >= lobbies[req.session.lobby].players.length) {
         //this.start(req, res, next);
+        lobbies[req.session.lobby].players.sort(); 
         RatingCtrl.findBalancedTeams(lobbies[req.session.lobby].players)
         .then(function (result) {
             lobbies[req.session.lobby].players = result;
@@ -227,11 +229,7 @@ module.exports = {
       });
     });
   },*/
-  //TODO rewrite using promises and move relevant code to rating controller
-  //lobby controller should only check if the winner has been decided. This check isn't even coded
-  //in yet, but winner should be decided by first team to reach majority vote. Thats the only
-  //part lobby controller should handle.
-  voteWinner: function (req, res, next) {
+   voteWinner: function (req, res, next) {
     //for now, only 1 vote is needed to declare a winner. In the future, winner
     //will be decided by majority vote.
     //Also, we will use the ready array to hold the ids of players who have NOT voted yet
@@ -244,6 +242,16 @@ module.exports = {
     lobbies[req.session.lobby].ready.splice(lobbies[req.session.lobby].ready.indexOf(lobbies[req.session.userid]), 1);
     var players = lobbies[req.session.lobby].players;
     var rankings = req.params.winner == '0' ? [0, 1] : [1, 0];
+
+    RatingCtrl.rate(lobbies[req.session.lobby].players, rankings)
+      .then(function () {
+        LobbyEvents.emit('l:disband', req.session.lobby);
+        User.unsetLobby(lobbies[req.session.lobby].players);
+        //remove user from ready array as he or she has already voted 
+        res.status(200).json(true);
+      });
+    //the following code has been moved to the rate function in the rating controller
+    /*
     var options = {
       args: [rankings[0], rankings[1]],
       scriptPath: './server/components/matchmaking'
@@ -274,12 +282,15 @@ module.exports = {
         //remove user from ready array as he or she has already voted 
         res.status(200).json(true);
       });
-    });
+      });
+      */
   },
   disconnect: function(lobby, id) {
-    if (lobbies[lobby])
-      if (lobbies[lobby].players[id])
+    if (lobbies[lobby] && !lobbies[lobby].inProgress) {
+      var index = lobbies[lobby].players.indexOf(id);
+      if (index > 0)
         lobbies[lobby].players.splice(lobbies[lobby].players.indexOf(id), 1);
+    }
   },
 
   isActiveLobby: function(lobby) {

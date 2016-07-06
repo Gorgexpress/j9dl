@@ -1,10 +1,23 @@
 var User = require('./user.model');
+var _ = require('lodash');
 
 var users = {
-  20: {name: 'Deadprez'},
-  25: {name: 'vlv'},
-  26: {name: 'pojo'},
-  27: {name: 'shyrazn'}
+  20: {
+    name: 'Deadprez',
+    lobby: null
+  },
+  25: {
+    name: 'vlv',
+    lobby: null
+  },
+  26: {
+    name: 'pojo',
+    lobby: null
+  },
+  27: {
+    name: 'shyrazn',
+    lobby: null
+  }
 };
 
 //var users = {};
@@ -25,11 +38,23 @@ module.exports = {
     if (users[id])
       users[id].name = name;
     else
-      users[id] = {'name': name};
+      users[id] = {
+        'name': name,
+        lobby: null
+      };
   },
   isOnline: function(id) {
     return users[id] ? true : false;
   },
+
+  //delete the lobby variable for all user ids in the userids array
+  unsetLobby: function(userids) {
+    _.each(userids, function (userid) {
+      users[userid].lobby = null;
+    });
+  },
+
+  //returns users object, not currently used.
   listOnline: function() {
     return users;
   }

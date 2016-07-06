@@ -86,6 +86,7 @@ angular.module('myApp')
         $scope.showButtons = true;
       if (Object.keys($scope.lobbyInfo.users).length == 4){
         $scope.lobbyFull = true;
+        console.log("hello");
         Sound.play('gameIsFull');
       }
     });
@@ -152,12 +153,13 @@ angular.module('myApp')
     var timeoutPromise = null; 
     refreshLobbyUserList($scope.$parent.lobby);
     $scope.$on('$destroy', function (event) {
-      Socket.removeAllListeners('l:joined');
+      Socket.removeAllListeners('l:join');
       Socket.removeAllListeners('l:left');
       Socket.removeAllListeners('l:ready');
       Socket.removeAllListeners('l:unready');
       Socket.removeAllListeners('l:start');
-
+      if (timeoutPromise)
+        $timeout.cancel(timeoutPromise);
     });
 
   });

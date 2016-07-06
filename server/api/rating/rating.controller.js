@@ -18,30 +18,73 @@ module.exports = {
       args: [],
       scriptPath: './server/components/matchmaking'
     }; 
+    //sort both userids array and query results so they are n the same order
+    userids = _.sortBy(userids);
+    var query = Rating.find({'userid': { $in: userids}}, null, {sort:{userid:1}}).exec();
 
-   var query = Rating.find({'userid': { $in: userids}}).exec();
+    return query
+      .then(function (ratings) {
+        //every two numbers in our args array corresponds to a player's 
+        //mu and sigma respectively. 
+        _.each(userids, function (userid, index) {
+          var rating = ratings[index];
+          if (!rating) {
+            rating = new Rating({'userid': userid});
+            rating.save();
+          }
+          options.args.push(rating.mu);
+          options.args.push(rating.sigma);
+        });
+        return PythonShell.runAsync('find_balanced_teams.py', options);
+      })
+      .then(function (results){
+        var indices = JSON.parse(results[0]);
+        var balancedPlayers = [];
+        _.each(indices, function (index) {
+          balancedPlayers.push(userids[index]);
+        });
+        return balancedPlayers;
+      })
+      .catch(function (err) {
+        console.log(err);
+      });
+  },
+
+  rate: function(userids, rankings) {
+    var options = {
+      args: [rankings[0], rankings[1]],
+      scriptPath: './server/components/matchmaking'
+    }; 
+    //every two numbers in our args array corresponds to a player's 
+    //mu and sigma respectively.
+    userids = _.sortBy(userids);
+    var query = Rating.find({'userid': { $in: userids}}, null, {sort:{userid:1}}).exec();
+
+    var pythonPromise = query
+      .then(function (ratings) {
+        //every two numbers in our args array corresponds to a player's 
+        //mu and sigma respectively. 
+        _.each(userids, function (userid, index) {
+          var rating = ratings[index];
+          options.args.push(rating.mu);
+          options.args.push(rating.sigma);
+        });
+        return PythonShell.runAsync('recalculate_ratings.py', options);
+      })
+      .catch(function (err) {
+        console.log(err);
+      });
     
-    return query.then(function (ratings) {
-      //every two numbers in our args array corresponds to a player's 
-      //mu and sigma respectively. 
-      _.each(userids, function (userid, index) {
-        var rating = ratings[index];
-        if (!rating) {
-          rating = new Rating({'userid': userid});
-          rating.save();
-        }
-        options.args.push(rating.mu);
-        options.args.push(rating.sigma);
+    return Promise.join(query, pythonPromise, function (ratings, results) {
+      var newRatings = JSON.parse(results[0]);
+        _.each(newRatings, function (rating, index) {
+          ratings[index].mu = rating.mu;
+          ratings[index].sigma = rating.sigma;
+          ratings[index].save();
+        });
+      })
+      .catch(function (err) {
+        console.log(err);
       });
-      return PythonShell.runAsync('find_balanced_teams.py', options);
-    })
-    .then(function (results){
-      var indices = JSON.parse(results[0]);
-      var balancedPlayers = [];
-      _.each(indices, function (index) {
-        balancedPlayers.push(userids[index]);
-      });
-      return balancedPlayers;
-    });
   }
 };

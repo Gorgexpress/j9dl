@@ -26,4 +26,3 @@ for combination in combinations(indices[1:], halfLength):
         bestTeams = team1Indices + team2Indices
 
 print bestTeams
-
