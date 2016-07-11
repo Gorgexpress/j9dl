@@ -132,6 +132,7 @@ module.exports = {
   },
 
   ready: function(req, res, next) {
+    var lobbyObject = lobbies[req.session.lobby];
     if (!req.session.lobby) {
       console.log(req.session.userid + " used ready from lobby api but no lobby variable is set in session");
       res.status(409).json({});
@@ -152,6 +153,11 @@ module.exports = {
         .then(function (result) {
             lobbies[req.session.lobby].players = result;
             lobbies[req.session.lobby].inProgress = true;
+            //enable voting after a set amount of time
+            setTimeout( function enableVoting() {
+              if(lobbyObject)
+                lobbyObject.canVote = true;
+            }, 300);
             return res.status(200).json(true);
         });
       }
