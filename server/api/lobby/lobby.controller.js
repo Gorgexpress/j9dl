@@ -5,7 +5,6 @@ var PythonShell = require('python-shell');
 var LobbyEvents = require('./lobby.events');
 var User = require('../user/user.controller');
 var _ = require('lodash');
-//TODO 95% of the controller logic ended up here.. should structure the api a different way.
 
 lobbies = {
   '-APEM pros only': {
@@ -291,6 +290,14 @@ module.exports = {
       if (index > 0)
         lobbies[lobby].players.splice(lobbies[lobby].players.indexOf(id), 1);
     }
+  },
+  //join without using an http request
+  //false if lobby does not exist, true otherwise
+  joinNoReq: function(lobby, userid) {
+    if (!lobbies[lobby])
+      return false;
+    lobbies[lobby].players.push(userid);
+    return true;
   },
 
   isActiveLobby: function(lobby) {

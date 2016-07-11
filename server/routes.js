@@ -20,7 +20,13 @@ app.get('/api/user/self', function(req, res, next) {
   var self = {};
   self.name = req.session.name;
   self.userid = req.session.userid;
-  self.lobby = req.session.lobby;
+  //A user is not disconnected from an active lobby even if the session is destroyed,
+  //so if the session variable for lobby is null we still need to check if our user's id is
+  //associated with an active lobby. 
+  if (req.session.lobby)
+    self.lobby = req.session.lobby;
+  else 
+    self.lobby = User.getActiveLobby(self.userid);
   self.inActiveLobby = Lobby.isActiveLobby(req.session.lobby);
   res.status(200).json(self);
 });

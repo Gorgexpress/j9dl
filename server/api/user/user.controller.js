@@ -1,4 +1,5 @@
 var User = require('./user.model');
+var Lobby = require('../lobby/lobby.controller');
 var _ = require('lodash');
 
 var users = {
@@ -53,7 +54,12 @@ module.exports = {
       users[userid].lobby = null;
     });
   },
-
+  
+  getActiveLobby: function(userid) {
+    if (!users[userid] || !users[userid].lobby)
+      return null;
+    return users[userid].lobby;
+  },
   //returns users object, not currently used.
   listOnline: function() {
     return users;
