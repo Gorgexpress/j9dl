@@ -6,7 +6,7 @@ var LobbyEvents = require('./lobby.events');
 var User = require('../user/user.controller');
 var _ = require('lodash');
 
-lobbies = {
+var lobbies = {
   '-APEM pros only': {
     'players': [20],
     'forbid': [1000],
@@ -252,6 +252,7 @@ module.exports = {
       .then(function () {
         LobbyEvents.emit('l:disband', req.session.lobby);
         User.unsetLobby(lobbies[req.session.lobby].players);
+        delete lobbies[req.session.lobby];
         //remove user from ready array as he or she has already voted 
         res.status(200).json(true);
       });
