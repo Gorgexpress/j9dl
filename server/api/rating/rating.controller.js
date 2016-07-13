@@ -16,7 +16,7 @@ module.exports = {
   findBalancedTeams: function(userids) {
     var options = {
       args: [],
-      scriptPath: './server/components/matchmaking'
+      scriptPath: './matchmaking'
     }; 
     //sort both userids array and query results so they are n the same order
     userids = _.sortBy(userids);
@@ -53,7 +53,7 @@ module.exports = {
   rate: function(userids, rankings) {
     var options = {
       args: [rankings[0], rankings[1]],
-      scriptPath: './server/components/matchmaking'
+      scriptPath: './matchmaking'
     }; 
     //every two numbers in our args array corresponds to a player's 
     //mu and sigma respectively.
