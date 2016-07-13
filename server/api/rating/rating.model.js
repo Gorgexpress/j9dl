@@ -1,5 +1,4 @@
 var mongoose = require('mongoose');
-mongoose.Promise = require('bluebird');
 var ratingSchema = new mongoose.Schema({
     userid: {
       type: Number,

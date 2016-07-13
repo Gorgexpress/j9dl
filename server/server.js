@@ -2,6 +2,7 @@ var express = require('express');
 var http = require('http');
 var path = require('path');
 var mongoose = require('mongoose');
+mongoose.Promise = require('bluebird');
 var app = express();
 var server = http.Server(app);
 var port = process.env.PORT || 3000;
