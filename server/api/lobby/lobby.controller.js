@@ -59,6 +59,7 @@ module.exports = {
       'users': {},
       'readyCount': lobbies[req.params.lobby].ready.length,
       'inProgress': lobbies[req.params.lobby].inProgress,
+      'canVote': lobbies[req.params.lobby].canVote,
       'order': playerIds //ordered array of ids, as objects are unordered and ordering is important
     };                   //important because order determines which team a player is on. TODO find a better way to do this
     Rating.find({
@@ -155,8 +156,10 @@ module.exports = {
             lobbies[req.session.lobby].inProgress = true;
             //enable voting after a set amount of time
             setTimeout( function enableVoting() {
-              if(lobbyObject)
+              if(lobbyObject) {
                 lobbyObject.canVote = true;
+                LobbyEvents.emit('l:enableVote');
+              }
             }, 300);
             return res.status(200).json(true);
         });

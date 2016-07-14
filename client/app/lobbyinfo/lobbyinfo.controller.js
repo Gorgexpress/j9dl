@@ -135,6 +135,9 @@ angular.module('myApp')
     Socket.on('l:start', function() {
       refreshLobbyUserList($scope.$parent.lobby);
     });
+    Socket.on('l:enableVote', () => {
+      $scope.lobbyInfo.canVote = true;
+    });
     $scope.lobbyInfo = {
       'users': {}
     };

@@ -58,6 +58,10 @@ module.exports = function(io, socket) {
   var listener = createListener('l:disband', socket);
   LobbyEvents.on('l:disband', listener);
   socket.on('disconnect', removeListener('l:disband', listener));
+
+  var listener2 = createListener('l:enableVote', socket);
+  LobbyEvents.on('l:enableVote', listener);
+  socket.on('disconnect', removeLiostener('l:enableVote', listener));
 };
 
 var createListener = function (event, socket) {
