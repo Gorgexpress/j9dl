@@ -45,4 +45,6 @@ app.post('/login', function(req, res, next) {
   User.setName(req.session.userid, req.session.name);
 });
 
+app.use('/auth', require('./auth').default);
+
 };

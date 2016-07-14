@@ -1,3 +1,4 @@
+import config from './environment';
 var session = require('express-session');
 var redis = require('redis');
 var redisStore = require('connect-redis')(session);
@@ -7,10 +8,9 @@ else
   var client = redis.createClient();
 var bodyParser = require('body-parser');
 var path = require('path');
-
 module.exports = function(app) {
 var sessionMiddleware = session({
-  secret: 'ergvergerg',
+  secret: config.secrets.session,
     store: new redisStore({ host: 'localhost', port: 6379, client: client,ttl : 260}),
     saveUninitialized: false,
     resave: false

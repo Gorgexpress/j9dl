@@ -13,7 +13,7 @@ var middleware = require('./config/express')(app);
 io.use(function(socket, next) {
   middleware(socket.request, socket.request.res, next);
 });
-
+console.log('plz');
 mongoose.connect(mongoURI);
 var controllers = require('./api/lobby/lobby.controller');
 require('./routes.js')(app);

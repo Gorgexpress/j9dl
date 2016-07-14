@@ -40,3 +40,6 @@ jspm_packages
 
 #ignore gulp-babel build files
 dist
+
+#ignore files containing environmental variables
+server/config/local.env.js

@@ -98,13 +98,12 @@ angular.module('myApp')
     $scope.newLobbyName = "";
     //grab user session info such as name, id, and lobby the client is currently in.
     var unregister = $scope.$watch('$parent.self', function () {
-      if ($scope.lobbies[$scope.$parent.self.lobby])
-        $scope.activeBtn = $scope.$parent.self.lobby;
-      else //lobby doesn't exist, set it to null
-        $scope.$parent.self.lobby = null;
+      $scope.activeBtn = $scope.$parent.self.lobby;
       unregister(); //we only need this watcher to know when the variable is initialized
+      refreshLobbyList();
+      if ($scope.lobbies[$scope.activeBtn])
+        $scope.lobbyButtonText = "Leave Lobby";
     });
-    refreshLobbyList();
       /*$scope.$on('$destroy', function (event) {
     Socket.removeAllListeners();
     });*/
