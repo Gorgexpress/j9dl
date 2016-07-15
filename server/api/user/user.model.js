@@ -1,9 +1,7 @@
 var mongoose = require('mongoose');
+
+const authTypes = ['steam'];
 var userSchema = new mongoose.Schema({
-    id: {
-      type: Number,
-      default: 0
-    },
     createdAt: {
       type: Date,
       default: Date.now
@@ -11,7 +9,19 @@ var userSchema = new mongoose.Schema({
     role: {
       type: Number,
       default: 0
-    }
+    },
+    password: {
+      type: String,
+      required: function () {
+        if (authTypes.indexOf(this.provider) === -1) {
+          return true;
+        } else {
+          return false;
+        }
+      }
+    },
+    provider: String,
+    steam: {}
   });
 
 

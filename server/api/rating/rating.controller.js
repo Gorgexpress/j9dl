@@ -57,17 +57,19 @@ module.exports = {
     }; 
     //every two numbers in our args array corresponds to a player's 
     //mu and sigma respectively.
-    userids = _.sortBy(userids);
-    var query = Rating.find({'userid': { $in: userids}}, null, {sort:{userid:1}}).exec();
-
+    const sortedUserids = _.sortBy(userids);
+    const loserOffset = userids.length / 2;
+    var order = [];
+    var query = Rating.find({'userid': { $in: sortedUserids}}, null, {sort:{userid:1}}).exec();
     var pythonPromise = query
       .then(function (ratings) {
         //every two numbers in our args array corresponds to a player's 
         //mu and sigma respectively. 
-        _.each(userids, function (userid, index) {
+        _.each(sortedUserids, function (userid, index) {
           var rating = ratings[index];
           options.args.push(rating.mu);
           options.args.push(rating.sigma);
+          order.push(userids.indexOf(userid));
         });
         return PythonShell.runAsync('recalculate_ratings.py', options);
       })
@@ -78,9 +80,9 @@ module.exports = {
     return Promise.join(query, pythonPromise, function (ratings, results) {
       var newRatings = JSON.parse(results[0]);
         _.each(newRatings, function (rating, index) {
-          ratings[index].mu = rating.mu;
-          ratings[index].sigma = rating.sigma;
-          ratings[index].save();
+          ratings[order[index]].mu = rating.mu;
+          ratings[order[index]].sigma = rating.sigma;
+          ratings[order[index]].save();
         });
       })
       .catch(function (err) {

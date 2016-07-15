@@ -158,7 +158,7 @@ module.exports = {
             setTimeout( function enableVoting() {
               if(lobbyObject) {
                 lobbyObject.canVote = true;
-                LobbyEvents.emit('l:enableVote');
+                LobbyEvents.emit('l:enableVote', req.session.lobby);
               }
             }, 300);
             return res.status(200).json(true);
@@ -315,6 +315,9 @@ module.exports = {
       return false;
     else
       return lobbies[lobby].inProgress;
-  }
+  },
 
+  playerInLobby: (lobby, userid) => {
+    return lobbies[lobby].players.indexOf(userid) > 0;
+  }
 };

@@ -23,8 +23,9 @@ app.get('/api/user/self', function(req, res, next) {
   //A user is not disconnected from an active lobby even if the session is destroyed,
   //so if the session variable for lobby is null we still need to check if our user's id is
   //associated with an active lobby. 
-  if (req.session.lobby)
-    self.lobby = req.session.lobby;
+  if (req.session.lobby) { 
+    self.lobby = Lobby.playerInLobby(req.session.lobby, self.userid) ? req.session.lobby : null;
+  }
   else 
     self.lobby = User.getActiveLobby(self.userid);
   self.inActiveLobby = Lobby.isActiveLobby(req.session.lobby);

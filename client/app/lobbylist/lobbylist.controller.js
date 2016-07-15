@@ -24,7 +24,7 @@ angular.module('myApp')
           if (response.status == 409)
             alert("That lobby name already exists!");
           else
-            alert("Could not create lobby: " + error);
+            alert("Could not create lobby: " + response.message);
         });
       } 
       else {
@@ -46,7 +46,7 @@ angular.module('myApp')
           $scope.activeBtn = lobby;
           $scope.$parent.lobby = lobby;
         }, function (response) {
-          alert("Could not join lobby: " + response);
+          alert("Could not join lobby: " + response.message);
         });
       }
     };
@@ -64,10 +64,11 @@ angular.module('myApp')
       if ($scope.$parent.lobby == lobby)
         $scope.$parent.lobby = null;
       //same for lobby the client is currently in
-      if ($scope.activeBtn === lobby) {
+      if ($scope.activeBtn == lobby) {
         $scope.lobbyButtonText = "Create Lobby";
         $scope.inLobby = false;
         $scope.activeBtn = "";
+        $scope.self.inActiveLobby = false;
       }
     });
     Socket.on('l:incCount', function (lobby) {

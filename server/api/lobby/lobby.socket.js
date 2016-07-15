@@ -55,13 +55,17 @@ module.exports = function(io, socket) {
   socket.on('l:decCount', function (lobby) {
     io.emit('l:decCount', lobby);
   });
+  //listener for disbanding lobby
   var listener = createListener('l:disband', socket);
   LobbyEvents.on('l:disband', listener);
   socket.on('disconnect', removeListener('l:disband', listener));
-
+  //listener for enabling voting for the winner
+  // TODO? Ideally this is only emitted to people in the lobby that voting was just
+  //enabled for. Currently, it emits to every socket and the client does the rest of the work.
+  //Shouldn't be a huge performance impact as this event won't happen often.
   var listener2 = createListener('l:enableVote', socket);
-  LobbyEvents.on('l:enableVote', listener);
-  socket.on('disconnect', removeLiostener('l:enableVote', listener));
+  LobbyEvents.on('l:enableVote', listener2);
+  socket.on('disconnect', removeListener('l:enableVote', listener2));
 };
 
 var createListener = function (event, socket) {

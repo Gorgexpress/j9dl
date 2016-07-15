@@ -1,8 +1,8 @@
 import config from '../config/environment';
 import express from 'express';
 import passport from 'passport';
-
-require('./steam/passport').setup(config);
+import User from '../api/user/user.model';
+require('./steam/passport').setup(User, config);
 
 var router = express.Router();
 

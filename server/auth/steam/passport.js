@@ -9,7 +9,7 @@ passport.deserializeUser(function(obj, done) {
   done(null, obj);
 });
 
-export function setup(config) {
+export function setup(User, config) {
   passport.use(new SteamStrategy({
     returnURL: config.steam.returnURL,
     realm: config.steam.realm,

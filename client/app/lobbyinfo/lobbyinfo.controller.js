@@ -86,7 +86,6 @@ angular.module('myApp')
         $scope.showButtons = true;
       if (Object.keys($scope.lobbyInfo.users).length == 4){
         $scope.lobbyFull = true;
-        console.log("hello");
         Sound.play('gameIsFull');
       }
     });
@@ -135,8 +134,9 @@ angular.module('myApp')
     Socket.on('l:start', function() {
       refreshLobbyUserList($scope.$parent.lobby);
     });
-    Socket.on('l:enableVote', () => {
-      $scope.lobbyInfo.canVote = true;
+    Socket.on('l:enableVote', (lobby) => {
+      if ($scope.$parent.lobby == lobby)
+        $scope.lobbyInfo.canVote = true;
     });
     $scope.lobbyInfo = {
       'users': {}
@@ -155,12 +155,15 @@ angular.module('myApp')
     //holds the promose from our $timeout call so we can cancel it if necessary
     var timeoutPromise = null; 
     refreshLobbyUserList($scope.$parent.lobby);
+
+    //destroy promises and listeners to stop memory leaks
     $scope.$on('$destroy', function (event) {
       Socket.removeAllListeners('l:join');
       Socket.removeAllListeners('l:left');
       Socket.removeAllListeners('l:ready');
       Socket.removeAllListeners('l:unready');
       Socket.removeAllListeners('l:start');
+      Socket.removeAllListeners('l:enableVote');
       if (timeoutPromise)
         $timeout.cancel(timeoutPromise);
     });
