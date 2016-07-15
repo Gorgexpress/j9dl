@@ -4,4 +4,5 @@
 Auto-balances a full lobby into balanced teams. 
 
 Has some python dependencies, which can be installed with pip using pip install -r requirements.txt.
-Start with npm start. Requires the dev dependencies for now. 
+Start with npm start. Requires the dev dependencies for now, and babel cli.
+Can also start with "gulp" which will transpile the server side code
