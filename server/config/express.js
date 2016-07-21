@@ -1,4 +1,5 @@
 import config from './environment';
+import passport from 'passport';
 var session = require('express-session');
 var redis = require('redis');
 var redisStore = require('connect-redis')(session);
@@ -9,8 +10,8 @@ else
 var bodyParser = require('body-parser');
 var path = require('path');
 module.exports = function(app) {
-var sessionMiddleware = session({
-  secret: config.secrets.session,
+  var sessionMiddleware = session({
+    secret: config.secrets.session,
     store: new redisStore({ host: 'localhost', port: 6379, client: client,ttl : 260}),
     saveUninitialized: false,
     resave: false
@@ -18,6 +19,7 @@ var sessionMiddleware = session({
   app.use(sessionMiddleware);
   app.use(bodyParser.json());
   app.use(bodyParser.urlencoded({extended: true}));
+  app.use(passport.initialize());
 
   app.set('view engine', 'html');
   app.set('clientPath', path.join(__dirname, '../../client/'));

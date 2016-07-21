@@ -13,7 +13,7 @@ _.forEach(localEnv, (value, key) => {
 
 var all = {
   steam: {
-    returnURL: process.env.STEAM_RETURNURL || 'http://localhost:3000/auth/steam/return',
+    returnURL: process.env.STEAM_RETURNURL || 'http://localhost:3000/auth/steam/callback',
     realm: process.env.REALM || 'http://localhost:3000/',
     apiKey: process.env.STEAM_APIKEY || null
   },

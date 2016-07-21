@@ -3,17 +3,8 @@ var User = require('./api/user/user.controller.js');
 var Rating = require('./api/rating/rating.controller.js');
 var Lobby = require('./api/lobby/lobby.controller');
 module.exports = function(app) {
-  /* GET home page. */
 
-app.get('/', function(req, res, next) {
-  if (!req.session.userid)
-    res.redirect('/login');
-  else{
-    if(!User.isOnline(req.session.userid))
-      User.setName(req.session.userid, req.session.name);
-    res.sendFile(app.get('clientPath') + 'index.html');
-  }
-});
+
 //TODO put remaining logic below in controllers
 app.use('/api/lobbies', require('./api/lobby'));
 app.get('/api/user/self', function(req, res, next) {
@@ -48,4 +39,13 @@ app.post('/login', function(req, res, next) {
 
 app.use('/auth', require('./auth').default);
 
+app.get('/', function(req, res, next) {
+  if (!req.session.userid)
+    res.redirect('/login');
+  else{
+    if(!User.isOnline(req.session.userid))
+      User.setName(req.session.userid, req.session.name);
+    res.sendFile(app.get('clientPath') + 'index.html');
+  }
+});
 };
