@@ -25,7 +25,7 @@ app.get('/api/user/self', function(req, res, next) {
 
 
 app.get('/login', function(req, res, next) {
-  res.sendFile(app.get('clientPath') + 'login.html');
+  res.sendFile(app.get('clientPath') + '/login.html');
 });
 
 //temporary login for testing before integrating steam
@@ -45,7 +45,7 @@ app.get('/', function(req, res, next) {
   else{
     if(!User.isOnline(req.session.userid))
       User.setName(req.session.userid, req.session.name);
-    res.sendFile(app.get('clientPath') + 'index.html');
+    res.sendFile(app.get('clientPath') + '/index.html');
   }
 });
 };

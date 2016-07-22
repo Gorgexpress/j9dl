@@ -22,6 +22,6 @@ module.exports = function(app) {
   app.use(passport.initialize());
 
   app.set('view engine', 'html');
-  app.set('clientPath', path.join(__dirname, '../../client/'));
+  app.set('clientPath', path.join(__dirname, '../../client'));
   return sessionMiddleware;
 };

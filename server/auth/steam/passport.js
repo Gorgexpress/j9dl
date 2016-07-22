@@ -9,10 +9,11 @@ export function setup(User, config) {
     passReqToCallback: true
   }, 
   function(req, identifier, profile, done) {
-    User.findOne({'steam.id': profile.id}).exec()
+    User.findOne({'steam.steamid': profile.id}).exec()
       .then(user => {
         if (user) {
           req.session.userid = user._id;
+          req.session.name = profile.displayName;
           return done(null, user);
         }
         user = new User({
@@ -20,6 +21,7 @@ export function setup(User, config) {
           steam: profile._json
         });
         req.session.userid = user.steam.steamid;
+        req.session.name = profile.displayName;
         user.save()
           .then(user => done(null, user))
           .catch(err => done(err));
