@@ -20,7 +20,9 @@ var all = {
 
   secrets: {
     session: process.env.SESSION_SECRET || 'secret'
-  }
+  },
+
+  lobbySize: 10
 
 };
 

@@ -2,6 +2,7 @@ var usernum = 1;
 var User = require('./api/user/user.controller.js');
 var Rating = require('./api/rating/rating.controller.js');
 var Lobby = require('./api/lobby/lobby.controller');
+import config from './config/environment';
 module.exports = function(app) {
 
 
@@ -11,6 +12,7 @@ app.get('/api/user/self', function(req, res, next) {
   var self = {};
   self.name = req.session.name;
   self.userid = req.session.userid;
+  self.lobbySize = config.lobbySize;
   //A user is not disconnected from an active lobby even if the session is destroyed,
   //so if the session variable for lobby is null we still need to check if our user's id is
   //associated with an active lobby. 

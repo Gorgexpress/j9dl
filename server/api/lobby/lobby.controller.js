@@ -4,8 +4,9 @@ var RatingCtrl = require('../rating/rating.controller.js');
 var PythonShell = require('python-shell');
 var LobbyEvents = require('./lobby.events');
 var User = require('../user/user.controller');
+import config from '../../config/environment';
 var _ = require('lodash');
-
+/*
 var lobbies = {
   '-APEM pros only': {
     'players': [20],
@@ -24,8 +25,8 @@ var lobbies = {
     'ready': [25, 26, 27]
   }
 };
-
-//var lobbies= {};
+*/
+var lobbies= {};
 module.exports = {
   list: function(req, res, next) {
     var list = {};
@@ -91,7 +92,7 @@ module.exports = {
     else if (req.session.lobby && lobbies[req.session.lobby] && 
              lobbies[req.session.lobby].players.indexOf(req.session.userid) > 0) 
     res.status(500).json("Already in lobby");
-    else if (lobbyData.players.length < 4){
+    else if (lobbyData.players.length < config.lobbySize){
       lobbyData.players.push(req.session.userid);
       req.session.lobby = req.params.lobby;
       res.status(200).json("Joined lobby" + req.params.lobby);
@@ -198,46 +199,8 @@ module.exports = {
     if (lobbyObject.players.length != lobbyObject.ready.length) {
       console.log(req.session.lobby + " tried to start but players and ready array have different values");
       res.status(409).json({});
-      return;
-    }
-    var options = {
-      args: [],
-      scriptPath: './server/components/matchmaking'
-    }; 
-
-    Rating.find({
-      'userid': { $in: lobbyObject.players}
-    }, function (err, ratings) {
-      //every two numbers in our args array corresponds to a player's 
-      //mu and sigma respectively. 
-      _.each(lobbyObject.players, function (userid, index) {
-        var rating = ratings[index];
-        if (!rating) {
-          rating = new Rating({'userid': userid});
-          rating.save();
-        }
-        options.args.push(rating.mu);
-        options.args.push(rating.sigma);
-      });
-      var indices = [];
-
-      PythonShell.run('find_balanced_teams.py', options, function (err, results) {
-        if(err) throw err;
-        indices = JSON.parse(results[0]);
-        var balancedPlayers = [];
-        _.each(indices, function (index) {
-          balancedPlayers.push(lobbyObject.players[index]);
-        });
-        lobbyObject.players = balancedPlayers;
-        lobbyObject.inProgress = true;
-        //tell the client we successfully balanced the lobby. They can get the results with the 
-        //get api call. If it's possible to cache the results of this api call we just send only
-        //the data that was changed in this one, rather than getting the whole lobby again.
-        res.status(200).json(true);
-      });
-    });
-  },*/
-   voteWinner: function (req, res, next) {
+      */
+  voteWinner: function (req, res, next) {
     //for now, only 1 vote is needed to declare a winner. In the future, winner
     //will be decided by majority vote.
     //Also, we will use the ready array to hold the ids of players who have NOT voted yet
@@ -247,7 +210,11 @@ module.exports = {
       res.status(409).json("Already voted");
       return;
     }
+    res.status(200).json(true);
     lobbies[req.session.lobby].ready.splice(lobbies[req.session.lobby].ready.indexOf(lobbies[req.session.userid]), 1);
+    //return if atleast half the players havent voted yet.
+    if (lobbies[req.session.lobby].ready.length > config.lobbySize/ 2)
+      return;
     var players = lobbies[req.session.lobby].players;
     var rankings = req.params.winner == '0' ? [0, 1] : [1, 0];
 
@@ -256,43 +223,7 @@ module.exports = {
         LobbyEvents.emit('l:disband', req.session.lobby);
         User.unsetLobby(lobbies[req.session.lobby].players);
         delete lobbies[req.session.lobby];
-        //remove user from ready array as he or she has already voted 
-        res.status(200).json(true);
       });
-    //the following code has been moved to the rate function in the rating controller
-    /*
-    var options = {
-      args: [rankings[0], rankings[1]],
-      scriptPath: './server/components/matchmaking'
-    }; 
-    //every two numbers in our args array corresponds to a player's 
-    //mu and sigma respectively. 
-    Rating.find({
-      'userid': { $in: lobbies[req.session.lobby].players}
-    }, function (err, ratings) {
-      //every two numbers in our args array corresponds to a player's 
-      //mu and sigma respectively. 
-      _.each(players, function (userid, index) {
-        var rating = ratings[index];
-        options.args.push(rating.mu);
-        options.args.push(rating.sigma);
-      });
-      PythonShell.run('recalculate_ratings.py', options, function (err, results) {
-        if(err) throw err;
-        newRatings = JSON.parse(results[0]);
-        _.each(newRatings, function (rating, index) {
-          ratings[index].mu = rating.mu;
-          ratings[index].sigma = rating.sigma;
-          ratings[index].save();
-        });
-        //delete lobby
-        delete lobbies[req.session.lobby];
-        LobbyEvents.emit('l:disband', req.session.lobby);
-        //remove user from ready array as he or she has already voted 
-        res.status(200).json(true);
-      });
-      });
-      */
   },
   disconnect: function(lobby, id) {
     if (lobbies[lobby] && !lobbies[lobby].inProgress) {

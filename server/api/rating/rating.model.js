@@ -1,16 +1,15 @@
 var mongoose = require('mongoose');
 var ratingSchema = new mongoose.Schema({
     userid: {
-      type: Number,
-      default: 0
+      type: String
     },
     mu: {
       type: Number,
-      default: 50
+      default: 25
     },
     sigma: {
       type: Number,
-      default: 5
+      default: 8
     }
   });
 

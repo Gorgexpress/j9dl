@@ -9,7 +9,7 @@ angular.module('myApp')
               $scope.showButtons = true;
             if ($scope.lobbyInfo.host === $scope.$parent.self.userid)
               $scope.isHost = true;
-            if ($scope.lobbyInfo.users.length >= 4) {
+            if ($scope.lobbyInfo.users.length >= $scope.$parent.self.lobbySize) {
               $scope.lobbyFull = true;
               Sound.play('gameIsFull');
             }
@@ -84,7 +84,7 @@ angular.module('myApp')
       };
       if(user.id === $scope.$parent.self.userid && $scope.lobbyInfo.users[user.id])
         $scope.showButtons = true;
-      if (Object.keys($scope.lobbyInfo.users).length == 4){
+      if (Object.keys($scope.lobbyInfo.users).length === $scope.$parent.self.lobbySize){
         $scope.lobbyFull = true;
         Sound.play('gameIsFull');
       }

@@ -10,7 +10,6 @@ router.get('/join/:lobby', controller.join);
 router.get('/leave', controller.leave);
 router.get('/ready', controller.ready);
 router.get('/unready', controller.unready);
-//router.get('/start', controller.start);
 router.get('/voteWinner/:winner', controller.voteWinner);
 router.post('/create/:name', controller.create);
 

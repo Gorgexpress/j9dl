@@ -8,11 +8,11 @@
     <div class="row">
       <div class="col-xs-3">
         <p>team1</p>
-        <p ng-repeat="userid in lobbyInfo.order | limitTo: 2">{{lobbyInfo.users[userid].name}} {{lobbyInfo.users[userid].mu}}</p>
+        <p ng-repeat="userid in lobbyInfo.order | limitTo: $parent.self.lobbySize / 2">{{lobbyInfo.users[userid].name}} {{lobbyInfo.users[userid].mu}}</p>
       </div>
       <div class="col-xs-3">
         <p>team2</p>
-        <p ng-repeat="userid in lobbyInfo.order | limitTo: -2">{{lobbyInfo.users[userid].name}} {{lobbyInfo.users[userid].mu}}</p>
+        <p ng-repeat="userid in lobbyInfo.order | limitTo: -$parent.self.lobbySize / 2">{{lobbyInfo.users[userid].name}} {{lobbyInfo.users[userid].mu}}</p>
       </div>
       <div class="col-xs-2">
         <button class="btn btn-primary" ng-click="voteWinner(0)" ng-disabled="!lobbyInfo.canVote">team1</button>

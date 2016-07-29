@@ -1,7 +1,7 @@
 var User = require('./user.model');
 var Lobby = require('../lobby/lobby.controller');
 var _ = require('lodash');
-
+/*
 var users = {
   20: {
     name: 'Deadprez',
@@ -20,8 +20,8 @@ var users = {
     lobby: null
   }
 };
-
-//var users = {};
+*/
+var users = {};
 
 module.exports = {
   getSelf: function(req, res, next) {
