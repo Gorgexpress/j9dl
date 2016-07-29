@@ -27,7 +27,7 @@ module.exports = function(io, socket) {
       io.to(socket.room).emit('l:join', user);
       //sync join with other sockets in the same session
       socket.broadcast.to('u:' + socket.request.session.userid).emit('l:sjoin', lobby);
-      io.emit('l:incCount', lobby); //increase playerCount in lobby list
+      socket.broadcast.emit('l:incCount', lobby); //increase playerCount in lobby list
     });
   });
   socket.on('l:left', function() {
