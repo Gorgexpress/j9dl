@@ -1,7 +1,7 @@
-var mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const authTypes = ['steam'];
-var userSchema = new mongoose.Schema({
+const userSchema = new mongoose.Schema({
     createdAt: {
       type: Date,
       default: Date.now
@@ -25,4 +25,4 @@ var userSchema = new mongoose.Schema({
   });
 
 
-module.exports = mongoose.model('User', userSchema);
+export default mongoose.model('User', userSchema);

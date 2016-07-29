@@ -68,13 +68,13 @@ module.exports = function(io, socket) {
   socket.on('disconnect', removeListener('l:enableVote', listener2));
 };
 
-let createListener = function (event, socket) {
+var createListener = function (event, socket) {
   return function (doc) {
     socket.emit(event, doc);
   };
 };
 
-let removeListener = function (event, listener) {
+var removeListener = function (event, listener) {
   return function () {
     LobbyEvents.removeListener(event, listener);
   };

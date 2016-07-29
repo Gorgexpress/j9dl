@@ -1,9 +1,8 @@
-import OnlineUser from '../user/user.controller.js';
 import Rating from '../rating/rating.model.js';
-import RatingCtrl from '../rating/rating.controller.js';
+import {rate, findBalancedTeams} from '../rating/rating.controller';
 import PythonShell from 'python-shell';
 import LobbyEvents from './lobby.events';
-import User  from '../user/user.controller';
+import {getName, unsetLobby}  from '../user/user.controller';
 import config from '../../config/environment';
 import _ from 'lodash';
 /*
@@ -69,7 +68,7 @@ export function get(req, res, next) {
           ratings[index].save();
         }
         lobbyObject.users[id] = {
-          'name': OnlineUser.getName(id),
+          'name': getName(id),
           'role': 0,
           'ready': lobbies[req.params.lobby].ready.indexOf(id) > 0,
           'mu': Math.round(ratings[index].mu)
@@ -149,7 +148,7 @@ export function ready(req, res, next) {
     if (lobbies[req.session.lobby].ready.length >= lobbies[req.session.lobby].players.length) {
       //this.start(req, res, next);
       lobbies[req.session.lobby].players.sort(); 
-      RatingCtrl.findBalancedTeams(lobbies[req.session.lobby].players)
+      findBalancedTeams(lobbies[req.session.lobby].players)
         .then(function (result) {
           lobbies[req.session.lobby].players = result;
           lobbies[req.session.lobby].inProgress = true;
@@ -216,10 +215,10 @@ export function voteWinner(req, res, next) {
   let players = lobbies[req.session.lobby].players;
   let rankings = req.params.winner == '0' ? [0, 1] : [1, 0];
 
-  RatingCtrl.rate(lobbies[req.session.lobby].players, rankings)
+  rate(lobbies[req.session.lobby].players, rankings)
     .then(function () {
       LobbyEvents.emit('l:disband', req.session.lobby);
-      User.unsetLobby(lobbies[req.session.lobby].players);
+      unsetLobby(lobbies[req.session.lobby].players);
       delete lobbies[req.session.lobby];
     });
 }

@@ -14,7 +14,7 @@ export function setTokenCookie(req, res) {
   if (!req.user) {
     return res.status(404).send('You aren\'t logged in!');
   }
-  var token = signToken(req.user._id, req.user.role);
+  let token = signToken(req.user._id, req.user.role);
   res.cookie('token', token);
   res.redirect('/');
 }

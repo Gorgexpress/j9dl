@@ -1,12 +1,12 @@
-var Lobby = require('../api/lobby/lobby.controller.js');
-var sockets = {}; //maps session.userid to socket.id
+import {disconnect} from '../api/lobby/lobby.controller.js';
+const sockets = {}; //maps session.userid to socket.id
 
 var onConnect = function (io, socket) {
   require('../api/chat/chat.socket')(io, socket);
   require('../api/lobby/lobby.socket')(io, socket);
 };
 
-module.exports = function(server){
+export default function(server){
   var io = require('socket.io')(server);
 
   io.on('connection', function(socket) {
@@ -22,7 +22,7 @@ module.exports = function(server){
     onConnect(io, socket);
     socket.on('disconnect', function() {
       if (socket.room) 
-        Lobby.disconnect(socket.request.session.lobby, socket.request.session.userid);
+        disconnect(socket.request.session.lobby, socket.request.session.userid);
       //remove socket.id from sockets map
       if (!sockets[socket.request.session.userid] || sockets[socket.request.session.userid].indexOf(socket.id) < 0)
         console.log(socket.id + "disconnected, but could not be found in the sockets to userid map");
@@ -34,4 +34,4 @@ module.exports = function(server){
     console.log('a user connected');
   });
   return io;
-};
+}

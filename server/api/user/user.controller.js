@@ -1,5 +1,5 @@
-var User = require('./user.model');
-var _ = require('lodash');
+import User from './user.model';
+import _ from 'lodash';
 /*
 var users = {
   20: {
@@ -20,47 +20,47 @@ var users = {
   }
 };
 */
-var users = {};
+const users = {};
 
-module.exports = {
-  getSelf: function(req, res, next) {
-    var self = {
-      'name': req.session.name,
-      'userid': req.session.userid,
-      'lobby': req.session.lobby
+
+export function getSelf(req, res, next) {
+  let self = {
+    'name': req.session.name,
+    'userid': req.session.userid,
+    'lobby': req.session.lobby
+  };
+  res.status(200).json(self);
+}
+export function getName(id) {
+  return users[id].name;
+}
+export function setName(id, name) {
+  if (users[id])
+    users[id].name = name;
+  else
+    users[id] = {
+      'name': name,
+      lobby: null
     };
-    res.status(200).json(self);
-  },
-  getName: function(id) {
-    return users[id].name;
-  },
-  setName: function(id, name) {
-    if (users[id])
-      users[id].name = name;
-    else
-      users[id] = {
-        'name': name,
-        lobby: null
-      };
-  },
-  isOnline: function(id) {
-    return users[id] ? true : false;
-  },
+}
+export function isOnline(id) {
+  return users[id] ? true : false;
+}
 
-  //delete the lobby variable for all user ids in the userids array
-  unsetLobby: function(userids) {
-    _.each(userids, function (userid) {
-      users[userid].lobby = null;
-    });
-  },
-  
-  getActiveLobby: function(userid) {
-    if (!users[userid] || !users[userid].lobby)
-      return null;
-    return users[userid].lobby;
-  },
-  //returns users object, not currently used.
-  listOnline: function() {
-    return users;
-  }
-};
+//delete the lobby variable for all user ids in the userids array
+export function unsetLobby(userids) {
+  _.each(userids, function (userid) {
+    users[userid].lobby = null;
+  });
+}
+
+export function getActiveLobby(userid) {
+  if (!users[userid] || !users[userid].lobby)
+    return null;
+  return users[userid].lobby;
+}
+//returns users object, not currently used.
+export function listOnline() {
+  return users;
+}
+

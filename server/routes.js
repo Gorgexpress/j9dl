@@ -1,9 +1,9 @@
 var usernum = 1;
-var User = require('./api/user/user.controller.js');
-var Rating = require('./api/rating/rating.controller.js');
+import {getActiveLobby, setName, isOnline} from './api/user/user.controller.js';
 import {playerInLobby, isActiveLobby} from './api/lobby/lobby.controller';
 import config from './config/environment';
-module.exports = function(app) {
+
+export default function(app) {
 
 
 //TODO put remaining logic below in controllers
@@ -20,7 +20,7 @@ app.get('/api/user/self', function(req, res, next) {
     self.lobby = playerInLobby(req.session.lobby, self.userid) ? req.session.lobby : null;
   }
   else 
-    self.lobby = User.getActiveLobby(self.userid);
+    self.lobby = getActiveLobby(self.userid);
   self.inActiveLobby = isActiveLobby(req.session.lobby);
   res.status(200).json(self);
 });
@@ -36,7 +36,7 @@ app.post('/login', function(req, res, next) {
   req.session.name = req.body.username;
   usernum += 1;
   res.redirect('/');
-  User.setName(req.session.userid, req.session.name);
+  setName(req.session.userid, req.session.name);
 });
 
 app.use('/auth', require('./auth').default);
@@ -45,9 +45,9 @@ app.get('/', function(req, res, next) {
   if (!req.session.userid)
     res.redirect('/login');
   else{
-    if(!User.isOnline(req.session.userid))
-      User.setName(req.session.userid, req.session.name);
+    if(!isOnline(req.session.userid))
+      setName(req.session.userid, req.session.name);
     res.sendFile(app.get('clientPath') + '/index.html');
   }
 });
-};
+}
