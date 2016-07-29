@@ -1,5 +1,4 @@
 var User = require('./user.model');
-var Lobby = require('../lobby/lobby.controller');
 var _ = require('lodash');
 /*
 var users = {

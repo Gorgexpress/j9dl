@@ -1,6 +1,5 @@
-
-var express = require('express');
-var controller = require('./lobby.controller');
+import express from 'express';
+import * as controller from './lobby.controller';
 
 var router = express.Router();
 

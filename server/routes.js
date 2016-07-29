@@ -1,7 +1,7 @@
 var usernum = 1;
 var User = require('./api/user/user.controller.js');
 var Rating = require('./api/rating/rating.controller.js');
-var Lobby = require('./api/lobby/lobby.controller');
+import {playerInLobby, isActiveLobby} from './api/lobby/lobby.controller';
 import config from './config/environment';
 module.exports = function(app) {
 
@@ -17,11 +17,11 @@ app.get('/api/user/self', function(req, res, next) {
   //so if the session variable for lobby is null we still need to check if our user's id is
   //associated with an active lobby. 
   if (req.session.lobby) { 
-    self.lobby = Lobby.playerInLobby(req.session.lobby, self.userid) ? req.session.lobby : null;
+    self.lobby = playerInLobby(req.session.lobby, self.userid) ? req.session.lobby : null;
   }
   else 
     self.lobby = User.getActiveLobby(self.userid);
-  self.inActiveLobby = Lobby.isActiveLobby(req.session.lobby);
+  self.inActiveLobby = isActiveLobby(req.session.lobby);
   res.status(200).json(self);
 });
 

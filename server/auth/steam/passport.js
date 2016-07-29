@@ -1,7 +1,7 @@
 import passport from 'passport';
 import {Strategy as SteamStrategy} from 'passport-steam';
 
-export function setup(User, config) {
+export function setup(User, Rating, config) {
   passport.use(new SteamStrategy({
     returnURL: config.steam.returnURL,
     realm: config.steam.realm,
@@ -12,7 +12,7 @@ export function setup(User, config) {
     User.findOne({'steam.steamid': profile.id}).exec()
       .then(user => {
         if (user) {
-          req.session.userid = user._id;
+          req.session.userid = user.id;
           req.session.name = profile.displayName;
           return done(null, user);
         }
@@ -20,10 +20,15 @@ export function setup(User, config) {
           provider: 'steam',
           steam: profile._json
         });
-        req.session.userid = user.steam.steamid;
+        req.session.userid = user.id;
         req.session.name = profile.displayName;
-        user.save()
-          .then(user => done(null, user))
+        let rating = new Rating({userid: user.id});
+        rating.save()
+          .then( () =>  {
+            user.save()
+            .then(user => done(null, user))
+            .catch(err => done(err));
+          })
           .catch(err => done(err));
       })
       .catch(err => done(err));
