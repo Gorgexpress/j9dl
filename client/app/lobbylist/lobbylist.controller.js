@@ -56,7 +56,7 @@ angular.module('myApp')
       }
     };
     Socket.on('l:new', function (lobby) {
-      $scope.lobbies[lobby] = 1;
+      $scope.lobbies[lobby] = 0;
     });
     Socket.on('l:disband', function(lobby) {
       delete $scope.lobbies[lobby];
@@ -72,7 +72,7 @@ angular.module('myApp')
       }
     });
     Socket.on('l:incCount', function (lobby) {
-      if ($scope.lobbies[lobby])
+      if (typeof($scope.lobbies[lobby] !== 'undefined'))
         $scope.lobbies[lobby]++;
     });
     Socket.on('l:decCount', function (lobby) {
