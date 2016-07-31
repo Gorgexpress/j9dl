@@ -1,111 +1,124 @@
-angular.module('myApp')
-  .controller('LobbyListCtrl', function($scope, LobbyList, Socket) {
-    'use strict';
-    var refreshLobbyList = function() {
-      LobbyList.listAll().then(function (response) { 
-        $scope.lobbies = response.data;
-      }, function (response) {
-        alert("Could not get list of lobbies: " + response);
-      });
-    };
-    $scope.createGame = function(name){
-      if (!$scope.inLobby) {
-        $scope.newLobbyName = "";
-        LobbyList.createLobby(name).then( function (response) {
-          $scope.lobbies[name] = 1;
-          Socket.emit('l:new', name);
-          Socket.emit('l:join', name);
-          $scope.lobbyButtonText = "Leave Lobby";
-          $scope.inLobby = true;
-          $scope.activeBtn = name;
-          $scope.$parent.lobby = name;
+export default class LobbyListCtrl {
 
-        }, function (response) {
-          if (response.status == 409)
-            alert("That lobby name already exists!");
-          else
-            alert("Could not create lobby: " + response.message);
-        });
-      } 
-      else {
-        //code to leave lobby 
-        LobbyList.leaveLobby();
-        Socket.emit('l:left', name);
-        $scope.lobbyButtonText = "Create Lobby";
-        $scope.inLobby = false;
-        $scope.activeBtn = "";
-        $scope.$parent.lobby = null;
-      }
-    };
-    $scope.joinLobby = function(lobby) {
-      if(!$scope.inLobby) {
-        LobbyList.joinLobby(lobby).then(function (response) {
-          $scope.inLobby = true;
-          $scope.lobbyButtonText = "Leave Lobby";
-          Socket.emit('l:join', lobby);
-          $scope.activeBtn = lobby;
-          $scope.$parent.lobby = lobby;
-        }, function (response) {
-          alert("Could not join lobby: " + response.message);
-        });
-      }
-    };
-    $scope.viewLobby = function(lobby) {
-      if($scope.$parent.lobby !== lobby){
-        $scope.$parent.lobby = lobby;
-      }
-    };
-    Socket.on('l:new', function (lobby) {
-      $scope.lobbies[lobby] = 0;
+  constructor($scope, LobbyList, Socket) {
+    this.LobbyList = LobbyList;
+    this.Socket = Socket;
+    this.$scope = $scope;
+    this.lobbies = {};
+    this.lobbyButtonText = "Create Lobby";
+    this.inLobby = false;
+    this.newLobbyName = "";
+    //grab user session info such as name, id, and lobby the client is currently in.
+    this.refreshLobbyList.bind(this);
+    //initSockets doesn't work when called with bind, but works fine without?????????????????????????
+    this.initSockets();
+    this.activeBtn = this.$scope.$parent.self.lobby;
+    if (this.lobbies[this.activeBtn])
+      this.lobbyButtonText = "Lave Lobby";
+  }
+  init(controller, unregister) {
+    controller.activeBtn = controller.$scope.$parent.$self.lobby;
+    unregister();
+    controller.refreshLobbyList();
+    controller.initSockets(controller.Socket);
+    if (controller.lobbies[controller.activeBtn]);
+      controller.lobbyButtonText = "Leave Lobby";
+
+  }
+  refreshLobbyList() {
+    this.LobbyList.listAll().then(function (response) { 
+      this.lobbies = response.data;
+    }, function (response) {
+      alert("Could not get list of lobbies: " + response.message);
     });
-    Socket.on('l:disband', function(lobby) {
-      delete $scope.lobbies[lobby];
+  }
+
+  createGame(name){
+    if (!this.inLobby) {
+      this.newLobbyName = "";
+      this.LobbyList.createLobby(name).then( response => {
+        this.lobbies[name] = 1;
+        this.Socket.emit('l:new', name);
+        this.Socket.emit('l:join', name);
+        this.lobbyButtonText = "Leave Lobby";
+        this.inLobby = true;
+        this.activeBtn = name;
+        this.$scope.$parent.lobby = name;
+
+      }, function (response) {
+        if (response.status == 409)
+          alert("That lobby name already exists!");
+        else
+          alert("Could not create lobby: " + response.message);
+      });
+    } 
+    else {
+      //code to leave lobby 
+      this.LobbyList.leaveLobby();
+      this.Socket.emit('l:left', name);
+      this.lobbyButtonText = "Create Lobby";
+      this.inLobby = false;
+      this.activeBtn = "";
+      this.$scope.$parent.lobby = null;
+    }
+  }
+  joinLobby(lobby) {
+    if(!this.inLobby) {
+      this.LobbyList.joinLobby(lobby).then(function (response) {
+        this.inLobby = true;
+        this.lobbyButtonText = "Leave Lobby";
+        this.Socket.emit('l:join', lobby);
+        this.activeBtn = lobby;
+        this.$scope.$parent.lobby = lobby;
+      }, function (response) {
+        alert("Could not join lobby: " + response.message);
+      });
+    }
+  }
+  viewLobby(lobby) {
+    if(this.$scope.$parent.lobby !== lobby){
+      this.$scope.$parent.lobby = lobby;
+    }
+  }
+  initSockets() {
+    console.log("HELLO");
+    this.Socket.on('l:new', lobby => {
+      this.lobbies[lobby] = 0;
+    });
+    this.Socket.on('l:disband', lobby => {
+      delete this.lobbies[lobby];
       //if currently viewed lobby was disbanded, set that value to null
-      if ($scope.$parent.lobby == lobby)
-        $scope.$parent.lobby = null;
+      if (this.$scope.$parent.lobby == lobby)
+        this.$scope.$parent.lobby = null;
       //same for lobby the client is currently in
-      if ($scope.activeBtn == lobby) {
-        $scope.lobbyButtonText = "Create Lobby";
-        $scope.inLobby = false;
-        $scope.activeBtn = "";
-        $scope.self.inActiveLobby = false;
+      if (this.activeBtn == lobby) {
+        this.lobbyButtonText = "Create Lobby";
+        this.inLobby = false;
+        this.activeBtn = "";
+        this.self.inActiveLobby = false;
       }
     });
-    Socket.on('l:incCount', function (lobby) {
-      if (typeof($scope.lobbies[lobby] !== 'undefined'))
-        $scope.lobbies[lobby]++;
+    this.Socket.on('l:incCount', lobby => {
+      if (typeof(this.lobbies[lobby] !== 'undefined'))
+        this.lobbies[lobby]++;
     });
-    Socket.on('l:decCount', function (lobby) {
-      if ($scope.lobbies[lobby])
-        $scope.lobbies[lobby]--;
+    this.Socket.on('l:decCount', lobby => {
+      if (this.lobbies[lobby])
+        this.lobbies[lobby]--;
     });
     //sync join, emitted only to tabs that share the same session
-    Socket.on('l:sjoin', function(lobby) {
-      $scope.inLobby = true;
-      $scope.lobbyButtonText = "Leave Lobby";
-      $scope.activeBtn = lobby;
-      $scope.$parent.lobby = lobby;
+    this.Socket.on('l:sjoin', lobby => {
+      this.inLobby = true;
+      this.lobbyButtonText = "Leave Lobby";
+      this.activeBtn = lobby;
+      this.$scope.$parent.lobby = lobby;
     });
     //sync leave
-    Socket.on('l:sleave', function(lobby) {
-      $scope.inLobby = false;
-      $scope.lobbyButtonText = "Create Lobby";
-      $scope.activeBtn = "";
-      $scope.$parent.lobby = null;
+    this.Socket.on('l:sleave', lobby => {
+      this.inLobby = false;
+      this.lobbyButtonText = "Create Lobby";
+      this.activeBtn = "";
+      this.$scope.$parent.lobby = null;
     });
-    $scope.lobbies = [];
-    $scope.lobbyButtonText = "Create Lobby";
-    $scope.inLobby = false;
-    $scope.newLobbyName = "";
-    //grab user session info such as name, id, and lobby the client is currently in.
-    var unregister = $scope.$watch('$parent.self', function () {
-      $scope.activeBtn = $scope.$parent.self.lobby;
-      unregister(); //we only need this watcher to know when the variable is initialized
-      refreshLobbyList();
-      if ($scope.lobbies[$scope.activeBtn])
-        $scope.lobbyButtonText = "Leave Lobby";
-    });
-      /*$scope.$on('$destroy', function (event) {
-    Socket.removeAllListeners();
-    });*/
-  });
+  }
+}

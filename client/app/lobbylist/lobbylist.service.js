@@ -1,18 +1,18 @@
-angular.module('myApp')
-  .factory('LobbyList', function($http) {
-    'use strict';
-    return {
-      listAll: function() {
-        return $http.get('api/lobbies/list');
-      },
-      createLobby: function(name) {
-        return $http.post('api/lobbies/create/' + name);
-      },
-      joinLobby: function(lobby) {
-        return $http.get('api/lobbies/join/' + lobby);
-      },
-      leaveLobby: function() {
-        return $http.get('api/lobbies/leave');
-      }
-    };
-  });
+export default class LobbyListService { 
+  constructor($http) {
+    this.$http = $http;
+  }
+  listAll() {
+    return this.$http.get('api/lobbies/list');
+  }
+  createLobby(name) {
+    return this.$http.post('api/lobbies/create/' + name);
+  }
+  joinLobby(lobby) {
+    return this.$http.get('api/lobbies/join/' + lobby);
+  }
+  leaveLobby() {
+    return this.$http.get('api/lobbies/leave');
+  }
+
+}

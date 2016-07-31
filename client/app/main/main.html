@@ -1,7 +1,12 @@
 <div class="container-fluid">
   <div class="row">
     <div class="col-xs-3">
-      <lobby-list></lobby-list>
+      <span ng-switch="self.lobby">
+        <div ng-switch-when="undefined"></div>
+        <div ng-switch-default>
+        <lobby-list></lobby-list>
+        </div>
+      </span>
     </div>
     <div class="col-xs-9">
       <div class="row">

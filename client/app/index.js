@@ -1,0 +1,2 @@
+require('./lobbylist');
+require('./chat');
