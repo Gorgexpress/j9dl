@@ -1,21 +1,21 @@
-angular.module('myApp')
-  .factory('LobbyInfo', function($http) {
-    'use strict';
-    return {
-      get: function(lobby) {
-        return $http.get('api/lobbies/get/' + lobby);
-      },
+export default class LobbyInfo {
+  constructor($http) {
+    this.$http = $http;
+  }
+  get(lobby) {
+    return this.$http.get('api/lobbies/get/' + lobby);
+  }
 
-      ready: function() {
-        return $http.get('api/lobbies/ready');
-      },
+  ready() {
+    return this.$http.get('api/lobbies/ready');
+  }
 
-      unready: function() {
-        return $http.get('api/lobbies/unready');
-      },
+  unready() {
+    return this.$http.get('api/lobbies/unready');
+  }
 
-      voteWinner: function(winner) {
-        return $http.get('api/lobbies/voteWinner/' + winner);
-      }
-    };
-  });
+  voteWinner(winner) {
+    return this.$http.get('api/lobbies/voteWinner/' + winner);
+  }
+}
+

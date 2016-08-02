@@ -14,7 +14,7 @@ var build = function() {
 gulp.task('build', build);
 
 gulp.task('bundle', function() {
-  return gulp.src('src/entry.js')
+  return gulp.src('client/app.js')
     .pipe(webpack( require('./webpack.config.js') ))
     .pipe(gulp.dest('client/'));
 });

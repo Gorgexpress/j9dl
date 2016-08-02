@@ -9,15 +9,14 @@ export default class LobbyListCtrl {
     this.inLobby = false;
     this.newLobbyName = "";
     //grab user session info such as name, id, and lobby the client is currently in.
-    this.refreshLobbyList.bind(this);
-    //initSockets doesn't work when called with bind, but works fine without?????????????????????????
-    this.initSockets();
-    this.activeBtn = this.$scope.$parent.self.lobby;
+    this.refreshLobbyList.apply(this);
+    this.initSockets.call(this);
+    this.activeBtn = this.$scope.mainctrl.self.lobby;
     if (this.lobbies[this.activeBtn])
       this.lobbyButtonText = "Lave Lobby";
   }
   init(controller, unregister) {
-    controller.activeBtn = controller.$scope.$parent.$self.lobby;
+    controller.activeBtn = controller.$scope.mainctrl.$self.lobby;
     unregister();
     controller.refreshLobbyList();
     controller.initSockets(controller.Socket);
@@ -26,7 +25,7 @@ export default class LobbyListCtrl {
 
   }
   refreshLobbyList() {
-    this.LobbyList.listAll().then(function (response) { 
+    this.LobbyList.listAll().then( response => { 
       this.lobbies = response.data;
     }, function (response) {
       alert("Could not get list of lobbies: " + response.message);
@@ -43,7 +42,7 @@ export default class LobbyListCtrl {
         this.lobbyButtonText = "Leave Lobby";
         this.inLobby = true;
         this.activeBtn = name;
-        this.$scope.$parent.lobby = name;
+        this.$scope.mainctrl.lobby = name;
 
       }, function (response) {
         if (response.status == 409)
@@ -59,37 +58,36 @@ export default class LobbyListCtrl {
       this.lobbyButtonText = "Create Lobby";
       this.inLobby = false;
       this.activeBtn = "";
-      this.$scope.$parent.lobby = null;
+      this.$scope.mainctrl.lobby = null;
     }
   }
   joinLobby(lobby) {
     if(!this.inLobby) {
-      this.LobbyList.joinLobby(lobby).then(function (response) {
+      this.LobbyList.joinLobby(lobby).then( response => {
         this.inLobby = true;
         this.lobbyButtonText = "Leave Lobby";
         this.Socket.emit('l:join', lobby);
         this.activeBtn = lobby;
-        this.$scope.$parent.lobby = lobby;
+        this.$scope.mainctrl.lobby = lobby;
       }, function (response) {
         alert("Could not join lobby: " + response.message);
       });
     }
   }
   viewLobby(lobby) {
-    if(this.$scope.$parent.lobby !== lobby){
-      this.$scope.$parent.lobby = lobby;
+    if(this.$scope.mainctrl.lobby !== lobby){
+      this.$scope.mainctrl.lobby = lobby;
     }
   }
   initSockets() {
-    console.log("HELLO");
     this.Socket.on('l:new', lobby => {
       this.lobbies[lobby] = 0;
     });
-    this.Socket.on('l:disband', lobby => {
+    this.Socket.on('l:disband', (lobby, v2) => {
       delete this.lobbies[lobby];
       //if currently viewed lobby was disbanded, set that value to null
-      if (this.$scope.$parent.lobby == lobby)
-        this.$scope.$parent.lobby = null;
+      if (this.$scope.mainctrl.lobby == lobby)
+        this.$scope.mainctrl.lobby = null;
       //same for lobby the client is currently in
       if (this.activeBtn == lobby) {
         this.lobbyButtonText = "Create Lobby";
@@ -111,14 +109,14 @@ export default class LobbyListCtrl {
       this.inLobby = true;
       this.lobbyButtonText = "Leave Lobby";
       this.activeBtn = lobby;
-      this.$scope.$parent.lobby = lobby;
+      this.$scope.mainctrl.lobby = lobby;
     });
     //sync leave
     this.Socket.on('l:sleave', lobby => {
       this.inLobby = false;
       this.lobbyButtonText = "Create Lobby";
       this.activeBtn = "";
-      this.$scope.$parent.lobby = null;
+      this.$scope.mainctrl.lobby = null;
     });
   }
 }

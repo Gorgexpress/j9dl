@@ -1,12 +1,10 @@
-
-angular.module("myApp").factory('Sound', function ($rootScope) {
-  var sounds = {
-    'gameIsFull': new Audio('/sounds/gameIsFull.wav'),
-  };
-  return {
-    play: function(soundName) {
-      console.log('playing sound');
-      sounds[soundName].play();
-    }
-  };
-});
+export default class Sound {
+  constructor() {
+    this.sounds = {
+      'gameIsFull': new Audio('/sounds/gameIsFull.wav')
+    };
+  }
+  play(soundName) {
+    this.sounds[soundName].play();
+  }
+}

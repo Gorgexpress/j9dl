@@ -4,7 +4,7 @@ var path = require('path');
 module.exports = {
   context: __dirname + "/client",
   entry: {
-    app: './app/index.js',
+    app: './app/app.js',
   },
   output: {
     path: __dirname,
@@ -25,5 +25,8 @@ module.exports = {
         }
       },
     ]
-  }  
+  },
+  node: {
+    fs: "empty"
+  }
 };

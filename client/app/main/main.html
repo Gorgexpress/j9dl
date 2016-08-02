@@ -1,8 +1,8 @@
 <div class="container-fluid">
   <div class="row">
     <div class="col-xs-3">
-      <span ng-switch="self.lobby">
-        <div ng-switch-when="undefined"></div>
+      <span ng-switch="mainctrl.self.lobby">
+        <div ng-switch-when=""></div>
         <div ng-switch-default>
         <lobby-list></lobby-list>
         </div>
@@ -10,7 +10,7 @@
     </div>
     <div class="col-xs-9">
       <div class="row">
-        <span ng-switch="lobby">
+        <span ng-switch="mainctrl.lobby">
           <div ng-switch-when="null"></div>
           <div ng-switch-default>
           <lobby-info></lobby-info> 

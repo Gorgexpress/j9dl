@@ -1,6 +1,5 @@
-'use strict';
-
-angular.module("myApp").factory('Socket', function ($rootScope) {
+import io from 'socket.io-client';
+export default function Socket($rootScope) {
   var socket = io();
   return {
     on: function (eventName, callback) {
@@ -25,4 +24,4 @@ angular.module("myApp").factory('Socket', function ($rootScope) {
       socket.removeAllListeners(eventName);
     }
   };
-});
+}
