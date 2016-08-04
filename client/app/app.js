@@ -11,5 +11,6 @@ var app = angular.module('myApp', ['ui.bootstrap', 'ui.router'])
 require('./main/main.js');
 require('./main');
 require('./lobbylist');
+require('./lobbyinfo');
 require('./chat');
 require('../components');

@@ -53,12 +53,14 @@ export default class LobbyListCtrl {
     } 
     else {
       //code to leave lobby 
-      this.LobbyList.leaveLobby();
-      this.Socket.emit('l:left', name);
-      this.lobbyButtonText = "Create Lobby";
-      this.inLobby = false;
-      this.activeBtn = "";
-      this.$scope.mainctrl.lobby = null;
+      this.LobbyList.leaveLobby()
+        .then( response =>  {
+          this.Socket.emit('l:left', name);
+          this.lobbyButtonText = "Create Lobby";
+          this.inLobby = false;
+          this.activeBtn = "";
+          this.$scope.mainctrl.lobby = "";
+        });
     }
   }
   joinLobby(lobby) {
@@ -69,6 +71,7 @@ export default class LobbyListCtrl {
         this.Socket.emit('l:join', lobby);
         this.activeBtn = lobby;
         this.$scope.mainctrl.lobby = lobby;
+        this.lobbies[lobby]++;
       }, function (response) {
         alert("Could not join lobby: " + response.message);
       });
@@ -83,21 +86,21 @@ export default class LobbyListCtrl {
     this.Socket.on('l:new', lobby => {
       this.lobbies[lobby] = 0;
     });
-    this.Socket.on('l:disband', (lobby, v2) => {
+    this.Socket.on('l:disband', lobby => {
       delete this.lobbies[lobby];
       //if currently viewed lobby was disbanded, set that value to null
-      if (this.$scope.mainctrl.lobby == lobby)
-        this.$scope.mainctrl.lobby = null;
+      if (this.$scope.mainctrl.lobby === lobby)
+        this.$scope.mainctrl.lobby = "";
       //same for lobby the client is currently in
-      if (this.activeBtn == lobby) {
+      if (this.activeBtn === lobby) {
         this.lobbyButtonText = "Create Lobby";
         this.inLobby = false;
         this.activeBtn = "";
-        this.self.inActiveLobby = false;
+        this.$scope.mainctrl.self.inActiveLobby = false;
       }
     });
     this.Socket.on('l:incCount', lobby => {
-      if (typeof(this.lobbies[lobby] !== 'undefined'))
+      if (typeof this.lobbies[lobby] !== 'undefined')
         this.lobbies[lobby]++;
     });
     this.Socket.on('l:decCount', lobby => {
@@ -116,7 +119,7 @@ export default class LobbyListCtrl {
       this.inLobby = false;
       this.lobbyButtonText = "Create Lobby";
       this.activeBtn = "";
-      this.$scope.mainctrl.lobby = null;
+      this.$scope.mainctrl.lobby = "";
     });
   }
 }

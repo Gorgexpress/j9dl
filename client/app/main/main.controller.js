@@ -3,7 +3,7 @@ export default class MainCtrl {
     this.$scope = $scope;
     this.Socket = Socket;
     this.Main = Main;
-    this.lobby = null;
+    this.lobby = "";
     this.self = {
       lobby: ''
     };

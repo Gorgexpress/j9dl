@@ -1,22 +1,22 @@
 <div class="panel panel-default" style="height: 50%;">
   <p> Users in Lobby</p>
-  <div ng-if="!lobbyInfo.inProgress">
-    <p ng-repeat="(key, data) in lobbyInfo.users"> {{ data.name}}  {{data.mu }} </p>
-    <button ng-if="showButtons && lobbyFull" ng-click="onReady()" ng-disabled="disableReadyButton" class="btn btn-primary">{{readyButtonText}}</button>
+  <div ng-if="!vm.lobbyInfo.inProgress">
+    <p ng-repeat="(key, data) in vm.lobbyInfo.users"> {{ data.name}}  {{data.mu }} </p>
+    <button ng-if="vm.showButtons && vm.lobbyFull" ng-click="vm.onReady()" ng-disabled="vm.disableReadyButton" class="btn btn-primary">{{readyButtonText}}</button>
   </div>
-  <div ng-if="lobbyInfo.inProgress">
+  <div ng-if="vm.lobbyInfo.inProgress">
     <div class="row">
       <div class="col-xs-3">
         <p>team1</p>
-        <p ng-repeat="userid in lobbyInfo.order | limitTo: $parent.self.lobbySize / 2">{{lobbyInfo.users[userid].name}} {{lobbyInfo.users[userid].mu}}</p>
+        <p ng-repeat="userid in vm.lobbyInfo.order | limitTo: mainctrl.self.lobbySize / 2">{{vm.lobbyInfo.users[userid].name}} {{vm.lobbyInfo.users[userid].mu}}</p>
       </div>
       <div class="col-xs-3">
         <p>team2</p>
-        <p ng-repeat="userid in lobbyInfo.order | limitTo: -$parent.self.lobbySize / 2">{{lobbyInfo.users[userid].name}} {{lobbyInfo.users[userid].mu}}</p>
+        <p ng-repeat="vm.userid in lobbyInfo.order | limitTo: -mainctrl.self.lobbySize / 2">{{vm.lobbyInfo.users[userid].name}} {{vm.lobbyInfo.users[userid].mu}}</p>
       </div>
       <div class="col-xs-2">
-        <button class="btn btn-primary" ng-click="voteWinner(0)" ng-disabled="!lobbyInfo.canVote">team1</button>
-        <button class="btn btn-primary" ng-click="voteWinner(1)" ng-disabled="!lobbyInfo.canVote">team2</button>
+        <button class="btn btn-primary" ng-click="vm.voteWinner(0)" ng-disabled="!vm.lobbyInfo.canVote">team1</button>
+        <button class="btn btn-primary" ng-click="vm.voteWinner(1)" ng-disabled="!vm.lobbyInfo.canVote">team2</button>
       </div>
     </div>
   </div>

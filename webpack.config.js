@@ -29,7 +29,5 @@ module.exports = {
   node: {
     fs: "empty"
   },
-  plugins: [
-    new webpack.optimize.UglifyJsPlugin()
-  ]
+  
 };

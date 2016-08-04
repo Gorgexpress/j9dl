@@ -226,7 +226,7 @@ export function disconnect(lobby, id) {
   if (lobbies[lobby] && !lobbies[lobby].inProgress) {
     let index = lobbies[lobby].players.indexOf(id);
     if (index > 0)
-      lobbies[lobby].players.splice(lobbies[lobby].players.indexOf(id), 1);
+      lobbies[lobby].players.splice(index, 1);
   }
 }
 //join without using an http request

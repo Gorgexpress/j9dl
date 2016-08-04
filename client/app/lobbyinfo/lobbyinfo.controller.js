@@ -18,6 +18,7 @@ export default class LobbyInfoCtrl {
     this.lobbyInfo = {
       'users': {}
     };
+    
     //holds the promose from our $timeout call so we can cancel it if necessary
     this.timeoutPromise = null; 
     this.refreshLobbyUserList.call(this, $scope.mainctrl.lobby);
@@ -29,14 +30,14 @@ export default class LobbyInfoCtrl {
       Socket.removeAllListeners('l:unready');
       Socket.removeAllListeners('l:start');
       Socket.removeAllListeners('l:enableVote');
-      if (timeoutPromise)
+      if (this.timeoutPromise)
         this.$timeout.cancel(this.timeoutPromise);
     });
   }
 
   refreshLobbyUserList(lobby) {
     if (lobby)
-      LobbyInfo.get(lobby)
+      this.LobbyInfo.get(lobby)
         .then( response => { 
           this.lobbyInfo = response.data;
           if (this.lobbyInfo.users[this.$scope.mainctrl.self.userid])
@@ -45,9 +46,9 @@ export default class LobbyInfoCtrl {
             this.isHost = true;
           if (this.lobbyInfo.users.length >= this.$scope.mainctrl.self.lobbySize) {
             this.lobbyFull = true;
-            Sound.play('gameIsFull');
+            this.Sound.play('gameIsFull');
           }
-        }, function (response) {
+        }, response => {
           this.lobbyInfo.users = [];
           alert("Could not get lobby: " + response);
         });
@@ -58,15 +59,15 @@ export default class LobbyInfoCtrl {
   //it to ready and unready repeatedly 
   reenableReadyButtonCallback() {
     this.disableReadyButton = false;
-    timeoutPromise = null;
+    this.timeoutPromise = null;
   }
 
   //when clicking ready button, ready or unready
   onReady() {
     if (!this.ready) {
-      LobbyInfo.ready()
-        .then(function (response) {
-          Socket.emit('l:ready', this.$scope.mainctrl.self.userid);
+      this.LobbyInfo.ready()
+        .then( response => {
+          this.Socket.emit('l:ready', this.$scope.mainctrl.self.userid);
           this.readyButtonText = "Unready";
           this.disableReadyButton = true;
           this.ready = true;
@@ -82,14 +83,14 @@ export default class LobbyInfoCtrl {
         });
     }
     else {
-      LobbyInfo.unready()
-        .then(function (response) {
-          Socket.emit('l:unready', this.$scope.mainctrl.self.userid);
+      this.LobbyInfo.unready()
+        .then( response => {
+          this.Socket.emit('l:unready', this.$scope.mainctrl.self.userid);
           this.readyButtonText = "Ready";
           this.disableReadyButton = true;
           this.ready = false;
           this.lobbyInfo.readyCount--;
-          timeoutPromise = this.$timeout(reenableReadyButtonCallback, 3000);
+          this.timeoutPromise = this.$timeout(reenableReadyButtonCallback, 3000);
         }, function (response) {
           alert(response);
         });
@@ -98,7 +99,7 @@ export default class LobbyInfoCtrl {
 
   //vote for winner after a game is finished
   voteWinner(winner) {
-    LobbyInfo.voteWinner(winner)
+    this.LobbyInfo.voteWinner(winner)
       .then( response => {
         this.votes[winner]++;
         if(this.votes[winner] >= this.lobbyInfo.users.length / 2){
