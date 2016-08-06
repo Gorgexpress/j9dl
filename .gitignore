@@ -41,7 +41,7 @@ jspm_packages
 #ignore gulp-babel build files
 dist
 
-*.bundle.js
+*bundle.js
 
 #ignore files containing environmental variables
 server/config/local.env.js
