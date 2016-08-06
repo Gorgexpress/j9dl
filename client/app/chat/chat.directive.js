@@ -1,6 +1,7 @@
 export default function chat() {
   return {
     templateUrl: 'app/chat/chat.html',
-    controller: 'ChatCtrl'
+    controller: 'ChatCtrl',
+    controllerAs: 'vm'
   };
 }
