@@ -1,5 +1,6 @@
 import config from './environment';
 import passport from 'passport';
+import cookieParser from 'cookie-parser';
 import session from 'express-session';
 import redis from 'redis';
 const redisStore = require('connect-redis')(session);
@@ -20,6 +21,7 @@ export default function(app) {
   app.use(sessionMiddleware);
   app.use(bodyParser.json());
   app.use(bodyParser.urlencoded({extended: true}));
+  app.use(cookieParser());
   app.use(passport.initialize());
 
   app.set('view engine', 'html');
