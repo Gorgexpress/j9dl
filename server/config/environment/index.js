@@ -12,6 +12,8 @@ _.forEach(localEnv, (value, key) => {
 });
 
 var all = {
+  env: process.env.NODE_ENV || 'production',
+
   steam: {
     returnURL: process.env.STEAM_RETURNURL || 'http://localhost:3000/auth/steam/callback',
     realm: process.env.REALM || 'http://localhost:3000/',
@@ -22,7 +24,7 @@ var all = {
     session: process.env.SESSION_SECRET || 'secret'
   },
 
-  lobbySize: 10
+  lobbySize: process.env.NODE_ENV !== 'test' ? 10 : 4
 
 };
 

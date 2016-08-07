@@ -225,8 +225,13 @@ export function voteWinner(req, res, next) {
 export function disconnect(lobby, id) {
   if (lobbies[lobby] && !lobbies[lobby].inProgress) {
     let index = lobbies[lobby].players.indexOf(id);
-    if (index > 0)
+    if (index > 0) {
       lobbies[lobby].players.splice(index, 1);
+      if (lobbies[lobby].host === id || lobbies[lobby].players.length === 0) {
+        delete lobbies[lobby];
+        LobbyEvents.emit('l:disband', req.session.lobby);
+      } 
+    }
   }
 }
 //join without using an http request

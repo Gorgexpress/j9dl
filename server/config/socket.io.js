@@ -21,8 +21,11 @@ export default function(server){
     });
     onConnect(io, socket);
     socket.on('disconnect', function() {
-      if (socket.room) 
+      if (sockets[socket.request.session.userid].length <= 1 && socket.room){ 
         disconnect(socket.request.session.lobby, socket.request.session.userid);
+        io.emit('l:decCount', socket.room.slice(2)); //decrease playerCount in lobby list, ignore the 'l:'
+        socket.broadcast.emit('l:left', socket.request.session.userid);
+      }
       //remove socket.id from sockets map
       if (!sockets[socket.request.session.userid] || sockets[socket.request.session.userid].indexOf(socket.id) < 0)
         console.log(socket.id + "disconnected, but could not be found in the sockets to userid map");

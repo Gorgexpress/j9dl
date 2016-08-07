@@ -2,7 +2,7 @@
   <p> Users in Lobby</p>
   <div ng-if="!vm.lobbyInfo.inProgress">
     <p ng-repeat="(key, data) in vm.lobbyInfo.users"> {{ data.name}}  {{data.mu }} </p>
-    <button ng-if="vm.showButtons && vm.lobbyFull" ng-click="vm.onReady()" ng-disabled="vm.disableReadyButton" class="btn btn-primary">{{readyButtonText}}</button>
+    <button ng-if="vm.showButtons && vm.lobbyFull" ng-click="vm.onReady()" ng-disabled="vm.disableReadyButton" class="btn btn-primary">{{vm.readyButtonText}}</button>
   </div>
   <div ng-if="vm.lobbyInfo.inProgress">
     <div class="row">
@@ -12,7 +12,7 @@
       </div>
       <div class="col-xs-3">
         <p>team2</p>
-        <p ng-repeat="vm.userid in lobbyInfo.order | limitTo: -mainctrl.self.lobbySize / 2">{{vm.lobbyInfo.users[userid].name}} {{vm.lobbyInfo.users[userid].mu}}</p>
+        <p ng-repeat="userid in vm.lobbyInfo.order | limitTo: -mainctrl.self.lobbySize / 2">{{vm.lobbyInfo.users[userid].name}} {{vm.lobbyInfo.users[userid].mu}}</p>
       </div>
       <div class="col-xs-2">
         <button class="btn btn-primary" ng-click="vm.voteWinner(0)" ng-disabled="!vm.lobbyInfo.canVote">team1</button>

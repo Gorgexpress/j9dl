@@ -21,6 +21,7 @@ export default class LobbyInfoCtrl {
     
     //holds the promose from our $timeout call so we can cancel it if necessary
     this.timeoutPromise = null; 
+    this.initSockets.call(this, Socket);
     this.refreshLobbyUserList.call(this, $scope.mainctrl.lobby);
     //destroy promises and listeners to stop memory leaks
     $scope.$on('$destroy', event => {
@@ -77,7 +78,7 @@ export default class LobbyInfoCtrl {
             this.$scope.mainctrl.self.inActiveLobby = true;
             refreshLobbyUserList(this.$scope.mainctrl.lobby);
           }
-          timeoutPromise = this.$timeout(reenableReadyButtonCallback, 3000);         
+          this.timeoutPromise = this.$timeout(this.reenableReadyButtonCallback.call(this), 3000);         
         }, function (response) {
           alert(response); 
         });
@@ -90,7 +91,7 @@ export default class LobbyInfoCtrl {
           this.disableReadyButton = true;
           this.ready = false;
           this.lobbyInfo.readyCount--;
-          this.timeoutPromise = this.$timeout(reenableReadyButtonCallback, 3000);
+          this.timeoutPromise = this.$timeout(this.reenableReadyButtonCallback.call(this), 3000);
         }, function (response) {
           alert(response);
         });
@@ -104,7 +105,7 @@ export default class LobbyInfoCtrl {
         this.votes[winner]++;
         if(this.votes[winner] >= this.lobbyInfo.users.length / 2){
           this.$scope.mainctrl.self.inActiveLobby = false;
-          refreshLobbyUserList();
+          refreshLobbyUserList(this.$scope.mainctrl.lobby);
         }
 
       }, function (response) {
@@ -112,7 +113,7 @@ export default class LobbyInfoCtrl {
       });
   }
   initSockets(Socket) {
-    Socket.on('l:join', function(user) {
+    Socket.on('l:join', user => {
       this.lobbyInfo.users[user.id] = {
         'name': user.name,
         'role': user.role,
@@ -122,10 +123,10 @@ export default class LobbyInfoCtrl {
         this.showButtons = true;
       if (Object.keys(this.lobbyInfo.users).length === this.$scope.mainctrl.self.lobbySize){
         this.lobbyFull = true;
-        Sound.play('gameIsFull');
+       this.Sound.play('gameIsFull');
       }
     });
-    Socket.on('l:left', function(user) {
+    Socket.on('l:left', user => {
       if (this.lobbyInfo.users[user])
         delete this.lobbyInfo.users[user];
       if (this.lobbyFull) {
@@ -135,12 +136,12 @@ export default class LobbyInfoCtrl {
         this.lobbyFull = false;
         this.ready = false;
         this.disableReadyButton = false;
-        if (timeoutPromise)
-          this.$timeout.cancel(timeoutPromise);
+        if (this.timeoutPromise)
+          this.$timeout.cancel(this.timeoutPromise);
       }
     });
 
-    Socket.on('l:ready', function(userid) {
+    Socket.on('l:ready', userid => {
       this.lobbyInfo.users[userid].ready = true;
       this.lobbyInfo.readyCount++;
       //sync between different sockets on the same session
@@ -148,15 +149,15 @@ export default class LobbyInfoCtrl {
         this.readyButtonText = "Unready";
         this.disableReadyButton = true;
         this.ready = true;
-        this.timeoutPromise = this.$timeout(reenableReadyButtonCallback, 3000);   
+        this.timeoutPromise = this.$timeout(this.reenableReadyButtonCallback.call(this), 3000);   
       }
       //if everyone is ready, refresh lobby info as teams will be balanced.
       if (Object.keys(this.lobbyInfo.users).length <= this.lobbyInfo.readyCount){
         this.$scope.mainctrl.self.inActiveLobby = true;
-        refreshLobbyUserList(this.$scope.mainctrl.lobby);
+        this.refreshLobbyUserList.call(this, this.$scope.mainctrl.lobby);
       }
     });
-    Socket.on('l:unready', function(userid) {
+    Socket.on('l:unready', userid => {
       this.lobbyInfo.readyCount--;
       this.lobbyInfo.users[userid].ready = false;
       //sync between different sockets on the same session
@@ -164,11 +165,11 @@ export default class LobbyInfoCtrl {
         this.readyButtonText = "Ready";
         this.disableReadyButton = true;
         this.ready = false;
-        this.timeoutPromise = this.$timeout(reenableReadyButtonCallback, 3000);
+        this.timeoutPromise = this.$timeout(this.reenableReadyButtonCallback.call(this), 3000);
       }
     });
-    Socket.on('l:start', function() {
-      refreshLobbyUserList(this.$scope.mainctrl.lobby);
+    Socket.on('l:start', () => {
+      this.refreshLobbyUserList.call(this, this.$scope.mainctrl.lobby);
     });
     Socket.on('l:enableVote', (lobby) => {
       if (this.$scope.mainctrl.lobby == lobby)
