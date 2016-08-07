@@ -1,5 +1,5 @@
-var LobbyEvents = require('./lobby.events');
-var Rating = require('../rating/rating.model.js');
+import LobbyEvents from './lobby.events';
+import Rating from '../rating/rating.model.js';
 
 module.exports = function(io, socket) {
   'use strict';
@@ -18,7 +18,7 @@ module.exports = function(io, socket) {
         rating = new Rating({userid: socket.request.session.userid});
         rating.save();
       }
-      var user = {
+      let user = {
         'id': socket.request.session.userid,
         'name': socket.request.session.name,
         'role': 0,
@@ -56,14 +56,14 @@ module.exports = function(io, socket) {
     io.emit('l:decCount', lobby);
   });
   //listener for disbanding lobby
-  var listener = createListener('l:disband', socket);
+  let listener = createListener('l:disband', socket);
   LobbyEvents.on('l:disband', listener);
   socket.on('disconnect', removeListener('l:disband', listener));
   //listener for enabling voting for the winner
   // TODO? Ideally this is only emitted to people in the lobby that voting was just
   //enabled for. Currently, it emits to every socket and the client does the rest of the work.
   //Shouldn't be a huge performance impact as this event won't happen often.
-  var listener2 = createListener('l:enableVote', socket);
+  let listener2 = createListener('l:enableVote', socket);
   LobbyEvents.on('l:enableVote', listener2);
   socket.on('disconnect', removeListener('l:enableVote', listener2));
 };

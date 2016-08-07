@@ -1,28 +1,26 @@
-'use strict';
-
-angular.module("myApp").factory('Socket', function ($rootScope) {
-  var socket = io();
-  return {
-    on: function (eventName, callback) {
-      socket.on(eventName, function () {
-        var args = arguments;
-        $rootScope.$apply(function () {
-          callback.apply(socket, args);
-        });
+import io from 'socket.io-client';
+export default class Socket {
+  constructor($timeout) {
+    this.$timeout= $timeout;
+    this.socket = io();
+  }
+  on(eventName, callback) {
+    this.socket.on(eventName, (...args) => {
+      this.$timeout( () => {
+        callback(...args);
       });
-    },
-    emit : function (eventName, data, callback) {
-      socket.emit(eventName, data, function () {
-        var args = arguments;
-        $rootScope.$apply(function () {
-          if (callback) {
-            callback.apply(socket, args);
-          }
-        });
+    });
+  }
+  emit(eventName, data, callback) {
+    this.socket.emit(eventName, data, (...args) => {
+      this.$timeout( () => {
+        if (callback) {
+          callback(...args);
+        }
       });
-    },
-    removeAllListeners: function (eventName, callback) {
-      socket.removeAllListeners(eventName);
-    }
-  };
-});
+    });
+  }
+  removeAllListeners(eventName, callback) {
+    this.socket.removeAllListeners(eventName);
+  }
+}

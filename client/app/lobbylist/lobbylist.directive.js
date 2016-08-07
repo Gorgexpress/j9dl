@@ -1,8 +1,8 @@
-angular.module('myApp')
-  .directive('lobbyList', function() {
-    return {
-      templateUrl: 'app/lobbylist/lobbylist.html',
-      controller: 'LobbyListCtrl',
-      scope: true
-    };
-  });
+export default function lobbyList() {
+  return {
+    templateUrl: 'app/lobbylist/lobbylist.html',
+    controller: 'LobbyListCtrl',
+    controllerAs: 'vm',
+    scope: true
+  };
+}

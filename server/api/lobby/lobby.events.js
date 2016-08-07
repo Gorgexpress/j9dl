@@ -1,4 +1,4 @@
-var EventEmitter = require('events');
+import EventEmitter from 'events';
 
 var LobbyEvents = new EventEmitter();
 
@@ -14,4 +14,4 @@ var emitEvent = function (event) {
   };
 };
 
-module.exports = LobbyEvents;
+export default LobbyEvents;

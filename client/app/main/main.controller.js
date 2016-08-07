@@ -1,16 +1,18 @@
-angular.module('myApp')
-  .controller('MainCtrl', function($scope, Socket, MainService) {
-    var getSelf = function () {
-      MainService.getSelf().then(function (response) {
-        $scope.self = response.data;
-      }, function(response) {
-        alert("Could not get user information: " + response);
-      });
+export default class MainCtrl { 
+  constructor($scope, $timeout, Socket, Main) {
+    this.$scope = $scope;
+    this.Socket = Socket;
+    this.Main = Main;
+    this.lobby = "";
+    this.self = {
+      lobby: ''
     };
-    $scope.lobby = null;
-    $scope.$on('$destroy', function (event) {
-      Socket.removeAllListeners();
+    $scope.$on('$destroy',event => Socket.removeAllListeners());
+    Main.getSelf().then( response => {
+      this.self = response.data;
+    }, response => {
+      alert("Could not get user information: " + response);
     });
-    $scope.self = {};
-    getSelf();
-  });
+  }
+}
+

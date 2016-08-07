@@ -1,7 +1,7 @@
 <div class="panel panel-default" style="height: 50%;overflow-y: scroll;">
   <p>Messages</p>
-    <p ng-repeat="message in messages track by $index"> {{ message }}</p>
-  <form ng-submit="sendMessage()">
-    <input type="text" ng-model="msgBox" class="form-control">
+    <p ng-repeat="message in vm.messages track by $index"> {{ message }}</p>
+  <form ng-submit="vm.sendMessage()">
+    <input type="text" ng-model="vm.msgBox" class="form-control">
   </form>
 </div> 

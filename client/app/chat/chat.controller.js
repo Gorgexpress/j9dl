@@ -1,18 +1,20 @@
-angular.module('myApp')
-  .controller('ChatCtrl', function($scope, Socket) {
+export default class ChatCtrl {
 
-$scope.sendMessage = function(msg){
-  Socket.emit('c:msg',$scope.msgBox);
-  $scope.msgBox = "";
-};
-Socket.on('c:msg', function(msg) {
-    if ($scope.messages.length > 10 )//may want to use a diff queue implementation
-    $scope.messages.shift(); //that avoids shift
-    $scope.messages.push(msg);
+  constructor(Socket) {
+    this.Socket = Socket;
+    this.messages = [];
+    this.messages.push("Welcome to j9dl!");
+    this.messages.push("Single click to view a lobby.");
+    this.messages.push("Double click to join a lobby.");
+    Socket.on('c:msg', msg => {
+      if (this.messages.length > 10 )//may want to use a diff queue implementation
+        this.messages.shift(); //that avoids shift
+      this.messages.push(msg);
     });
-$scope.messages = [];
-$scope.messages.push("Welcome to j9dl!");
-$scope.messages.push("Single click to view a lobby.");
-$scope.messages.push("Double click to join a lobby.");
+  }
 
-});
+  sendMessage(msg){
+    this.Socket.emit('c:msg',this.msgBox);
+    this.msgBox = "";
+  }
+}
