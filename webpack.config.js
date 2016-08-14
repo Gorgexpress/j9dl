@@ -13,6 +13,14 @@ module.exports = {
   module: {
     loaders: [
       {
+        loaders: ['ng-annotate?add=true'],
+        test: /\.jsx?$/,
+        include: [
+          path.resolve(__dirname, "client"),
+        ],
+
+      },
+      {
         loader: 'babel-loader',
         include: [
           path.resolve(__dirname, "client"),
@@ -26,8 +34,13 @@ module.exports = {
       },
     ]
   },
+  plugins: [
+    new webpack.optimize.UglifyJsPlugin({
+      mangle: false
+    })
+  ],
   node: {
     fs: "empty"
   },
-  
+
 };
