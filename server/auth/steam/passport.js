@@ -18,7 +18,11 @@ export function setup(User, Rating, config) {
         }
         user = new User({
           provider: 'steam',
-          steam: profile._json
+          steam: {
+            steamid: profile._json.steamid,
+            avatar: profile._json.avatar,
+            profileurl: profile._json.profileurl
+          }
         });
         req.session.userid = user.id;
         req.session.name = profile.displayName;
