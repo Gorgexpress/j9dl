@@ -1,4 +1,4 @@
-<div class="panel panel-default" style="height: 50%;overflow-y: scroll;">
+<div class="panel">
   <p>Messages</p>
     <p ng-repeat="message in vm.messages track by $index"> {{ message }}</p>
   <form ng-submit="vm.sendMessage()">
