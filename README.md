@@ -9,4 +9,4 @@ Can also start with "gulp" which will transpile the server side code
 
 Refractoring code to use es6 and webpack in es6r branch.
 
-Website link is a demo with a small amount of fake users already logged in, and no need to login via steam. It's behind the master branch for now.
+Website link is a demo with a small amount of fake users already logged in, and no need to login via steam. It's behind the master branch for now, and still pretty limited in what you can do without other users.
