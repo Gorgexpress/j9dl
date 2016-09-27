@@ -1,6 +1,4 @@
 chat div.panel {
-    border: 0;
-    box-shadow: none;
     height: 50%;
     overflow-y: auto;
 }

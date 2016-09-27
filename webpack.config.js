@@ -38,11 +38,11 @@ module.exports = {
       }
     ]
   },
-  plugins: [
+  /*plugins: [
     new webpack.optimize.UglifyJsPlugin({
       mangle: false
     })
-  ],
+  ],*/
   node: {
     fs: "empty"
   },

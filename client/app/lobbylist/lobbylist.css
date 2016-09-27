@@ -1,9 +1,7 @@
 lobby-list div.panel {
         overflow-y: auto;
         height: 100%;
-        border: 0;
-        box-shadow: none;
-        background: DimGrey;
+
     }
 
 lobby-list div.btn-group-vertical {

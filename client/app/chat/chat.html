@@ -2,6 +2,6 @@
   <p>Messages</p>
     <p ng-repeat="message in vm.messages track by $index"> {{ message }}</p>
   <form ng-submit="vm.sendMessage()">
-    <input type="text" ng-model="vm.msgBox" class="form-control">
+    <input type="text" ng-model="vm.msgBox" class="form-control" placeholder="Enter message...">
   </form>
 </div> 
