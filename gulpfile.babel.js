@@ -3,7 +3,18 @@ var babel = require('gulp-babel');
 var nodemon = require('nodemon');
 var webpack = require('webpack-stream');
 var runSequence = require('run-sequence');
+var gulpLoadPlugins = require('gulp-load-plugins');
+var lazypipe = require('lazypipe');
 
+var plugins = gulpLoadPlugins();
+var mocha = lazypipe()
+  .pipe(plugins.mocha, {
+    reporter: 'spec',
+    timeout: 5000,
+    require: [
+      './mocha.conf'
+    ]
+  });
 var build = function() {
   var stream = gulp.src('server/**/*')
     .pipe(babel())
@@ -40,5 +51,10 @@ gulp.task('env:test', function() {
 
 gulp.task('start:test', function() {
   runSequence('env:test', 'start');
+});
+
+gulp.task('test',['env:test'], function() {
+  return gulp.src(['dist/**/*.integration.js', 'mocha.global.js'])
+    .pipe(mocha());
 });
 

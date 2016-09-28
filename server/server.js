@@ -16,7 +16,7 @@ io.use(function(socket, next) {
 mongoose.connect(mongoURI);
 require('./routes.js').default(app);
 app.use(express.static(path.join(__dirname, '../client')));
-server.listen(port, function() {
+app.angularFullstack = server.listen(port, function() {
   console.log('listening on 3000');
 });
 

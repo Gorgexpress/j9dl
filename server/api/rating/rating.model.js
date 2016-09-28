@@ -9,7 +9,7 @@ const ratingSchema = new mongoose.Schema({
     },
     sigma: {
       type: Number,
-      default: 8
+      default: 8.3
     }
   });
 

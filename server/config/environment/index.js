@@ -24,8 +24,11 @@ var all = {
     session: process.env.SESSION_SECRET || 'secret'
   },
 
-  lobbySize: process.env.NODE_ENV !== 'test' ? 10 : 4
-
+  lobbySize: process.env.NODE_ENV !== 'test' ? 10 : 4,
+  
+  mongo: {
+    uri: process.env.NODE_ENV !== 'test' ? 'mongodb://localhost/j9dl' : 'mongodb://localhost/j9dl-test'
+  }
 };
 
 export default all;
