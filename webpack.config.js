@@ -8,7 +8,7 @@ module.exports = {
   },
   output: {
     path: __dirname,
-    filename: 'bundle.js'
+    filename: 'bundle.js',
   },
   module: {
     loaders: [
@@ -46,5 +46,5 @@ module.exports = {
   node: {
     fs: "empty"
   },
-
+  watch: true,
 };
